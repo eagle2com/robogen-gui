@@ -1,1 +1,11 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/imgs">
+        <file alias="CoreComponent">images/Core-with-electronics-300x169.png</file>
+        <file alias="FixedBrick">images/Core-300x169.png</file>
+        <file alias="ActiveHinge">images/ActiveHinge_ServoHolder_FrameWithoutHorn_Servo_20-deg.png</file>
+        <file alias="PassiveHinge">images/PassiveHinge-300x169.png</file>
+        <file alias="ParametricJoint">images/180px-Joint.png</file>
+        <file alias="LightSensor">images/LightSensor_External_smaller-length_bigger-diameter-300x169.png</file>
+        <file alias="IrSensor">images/IRsensor-300x154.jpg</file>
+    </qresource>
+</RCC>
