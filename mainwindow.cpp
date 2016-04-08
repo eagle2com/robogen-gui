@@ -6,6 +6,9 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QTime>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include <stdio.h>
 
@@ -225,6 +228,17 @@ void MainWindow::loadEvolution()
 void MainWindow::loadRobot()
 {
     QString filename = QFileDialog::getOpenFileName(this, "", robot_filename);
+    QString extension;
+    {
+        QStringList tokens = filename.split('.');
+        extension = tokens.back();
+    }
+
+    if(extension == "json")
+    {
+        loadRobotJson(filename);
+        return;
+    }
 
     QFile file(filename);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -232,6 +246,8 @@ void MainWindow::loadRobot()
     QString line;
 
     ui->robotConfigTree->clear();
+    robot_part_hash.clear();
+
     root_part = new RobotPart;
     root_part->type = PART_TYPE::CORE_COMPONENT;
 
@@ -257,26 +273,7 @@ void MainWindow::loadRobot()
         new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
         QString type = tokens.front(); tokens.pop_front();
 
-        if(type == "FixedBrick")
-            new_part->type = PART_TYPE::FIXED_BRICK;
-
-        else if(type == "ActiveHinge")
-            new_part->type = PART_TYPE::ACTIVE_HINGE;
-
-        else if(type == "PassiveHinge")
-            new_part->type = PART_TYPE::PASSIVE_HINGE;
-
-        else if(type == "IrSensor")
-            new_part->type = PART_TYPE::IR_SENSOR;
-
-        else if(type == "LightSensor")
-            new_part->type = PART_TYPE::LIGHT_SENSOR;
-
-        else if(type == "ParametricJoint")
-            new_part->type = PART_TYPE::PARAMETRIC_JOINT;
-
-
-
+        new_part->type = typeFromString(type);
         new_part->name = tokens.front(); tokens.pop_front();
         new_part->rotation = tokens.front().toInt(); tokens.pop_front();
 
@@ -310,11 +307,52 @@ void MainWindow::loadRobot()
         }
 
         new_part->update();
+        robot_part_hash.insert(new_part->name, new_part);
         root_part->update();
 
         prev_part = new_part;
     }
 
+    ui->robotConfigTree->addTopLevelItem(root_part);
+    ui->robotConfigTree->expandAll();
+}
+
+void MainWindow::loadRobotJson(QString filename)
+{
+    QFile file(filename);
+    file.open(QIODevice::ReadOnly);
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonObject object = doc.object();
+
+    QJsonArray parts = object["body"].toObject()["part"].toArray();
+
+    QHash<QString, RobotPart*> hash;
+
+    RobotPart *new_root_part = new RobotPart;
+    foreach (const QJsonValue & part, parts)
+    {
+        RobotPart *new_part = new RobotPart;
+        new_part->name = part.toObject()["id"].toString();
+        new_part->type = typeFromString(part.toObject()["type"].toString());
+        new_part->rotation = part.toObject()["orientation"].toInt();
+        if(new_part->type == PART_TYPE::CORE_COMPONENT)
+            new_root_part = new_part;
+        hash.insert(new_part->name, new_part);
+    }
+
+    QJsonArray connections = object["body"].toObject()["connection"].toArray();
+    foreach (const QJsonValue & connection, connections)
+    {
+        RobotPart *parent = hash[connection.toObject()["src"].toString()];
+        RobotPart *child = hash[connection.toObject()["dest"].toString()];
+        child->face = (PART_FACE)connection.toObject()["srcSlot"].toInt();
+        parent->addChild(child);
+        child->update();
+    }
+
+    root_part = new_root_part;
+    root_part->update();
+    ui->robotConfigTree->clear();
     ui->robotConfigTree->addTopLevelItem(root_part);
     ui->robotConfigTree->expandAll();
 }
@@ -615,6 +653,31 @@ void MainWindow::evolveReadReady()
 void MainWindow::onEvolveFinished(int)
 {
     ui->push_evolve->setEnabled(true);
+}
+
+PART_TYPE MainWindow::typeFromString(QString str)
+{
+    PART_TYPE type;
+
+    if(str == "FixedBrick")
+        type = PART_TYPE::FIXED_BRICK;
+
+    else if(str == "ActiveHinge")
+        type = PART_TYPE::ACTIVE_HINGE;
+
+    else if(str == "PassiveHinge")
+        type = PART_TYPE::PASSIVE_HINGE;
+
+    else if(str == "IrSensor")
+        type = PART_TYPE::IR_SENSOR;
+
+    else if(str == "LightSensor")
+        type = PART_TYPE::LIGHT_SENSOR;
+
+    else if(str == "ParametricJoint")
+        type = PART_TYPE::PARAMETRIC_JOINT;
+
+    return type;
 }
 
 MainWindow::~MainWindow()

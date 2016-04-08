@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTreeWidget>
 #include <QProcess>
+#include <QHash>
 
 enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
@@ -129,6 +130,7 @@ public slots:
     void loadSimulation();
     void loadEvolution();
     void loadRobot();
+    void loadRobotJson(QString filename);
 
     void saveSimulation();
     void saveEvolution();
@@ -160,6 +162,10 @@ private:
     QProcess *process_server;
     QProcess *process_evolve;
     QProcess *process_simulate;
+
+    QHash<QString, RobotPart*> robot_part_hash;
+
+    PART_TYPE typeFromString(QString str);
 
     int n_generation;
 };
