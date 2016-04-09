@@ -16,6 +16,7 @@ QT gui for interfacing with the robogen framework: www.robogen.org
 - If everything is setup correctly, GenerationBest-#.json lentries should appear in the list on the right.
 - Click on any of them and hit Simulate to preview the best robot of the selected generation
 - After the evolution finished, you can go to the analyze tab and hit Analyze to plot the graph of the generation stats.
+- DONT use any of the menubar buttons except for the load->robot one. Also don't load .txt files with brains defined in them, .json are OK.
 
 ## Issues
 - If Evolve stops before reaching the max generations, it is possible that mutations created an unusable configuration (robogen issue)
@@ -23,3 +24,4 @@ QT gui for interfacing with the robogen framework: www.robogen.org
 
 ## TODO
 - Add a default config file so we don't have to set directories each time (project-like?)
+- Brains
