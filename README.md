@@ -27,3 +27,4 @@ QT gui for interfacing with the robogen framework: www.robogen.org
 
 ## TODO
 - Brains
+- Add the missing parameters to the configuration
