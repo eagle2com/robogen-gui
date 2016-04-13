@@ -131,7 +131,9 @@ public slots:
     void loadEvolution();
     void loadRobot();
     void loadRobotJson(QString filename);
-    void loadConfig();
+
+    void onLoadConfig();
+    void loadConfig(QString default_path = "");
 
     void saveSimulation();
     void saveEvolution();

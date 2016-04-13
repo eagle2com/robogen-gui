@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->push_simulate, SIGNAL(clicked(bool)), this, SLOT(onPushSimulate()));
     connect(ui->push_analyze, SIGNAL(clicked(bool)), this, SLOT(onPushAnalyze()));
 
-    connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(loadConfig()));
+    connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(onLoadConfig()));
 
     RobotPart *part = new RobotPart;
     part->name = "ROOT";
@@ -90,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->spin_threads->setValue(1);
 
     qsrand(QTime::currentTime().elapsed());
+
+    loadConfig("./config.json");
 }
 
 void MainWindow::onAddPart()
@@ -365,32 +367,54 @@ void MainWindow::loadRobotJson(QString filename)
     ui->robotConfigTree->expandAll();
 }
 
-void MainWindow::loadConfig()
+void MainWindow::onLoadConfig()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "");
+    loadConfig();
+}
+
+void MainWindow::loadConfig(QString default_path)
+{
+    QString filename;
+    if(default_path != "")
+    {
+        filename = default_path;
+        //qDebug() << "Found default config.json file, loading ..." << endl;
+    }
+    else
+    {
+        filename = QFileDialog::getOpenFileName(this, "");
+    }
+
     if(filename == "")
             return;
 
     QFile file(filename);
-    file.open(QIODevice::ReadOnly);
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonObject object = doc.object();
-    qDebug() << "build path:" << object["build-path"].toString() << endl;
-    if(object["build-path"].toString() != "")
+    if(file.open(QIODevice::ReadOnly))
     {
-        ui->edit_robogenpath->setText(object["build-path"].toString());
-    }
+        if(filename == default_path)
+        {
+            qDebug() << "Found default config.json file, loading ..." << endl;
+        }
 
-    qDebug() << "output path:" << object["output-path"].toString() << endl;
-    if(object["output-path"].toString() != "")
-    {
-        ui->line_evolve->setText(object["output-path"].toString());
-    }
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        QJsonObject object = doc.object();
+        qDebug() << "build path:" << object["build-path"].toString() << endl;
+        if(object["build-path"].toString() != "")
+        {
+            ui->edit_robogenpath->setText(object["build-path"].toString());
+        }
 
-    qDebug() << "config path:" << object["config-path"].toString() << endl;
-    if(object["config-path"].toString() != "")
-    {
-        project_path = object["config-path"].toString();
+        qDebug() << "output path:" << object["output-path"].toString() << endl;
+        if(object["output-path"].toString() != "")
+        {
+            ui->line_evolve->setText(object["output-path"].toString());
+        }
+
+        qDebug() << "config path:" << object["config-path"].toString() << endl;
+        if(object["config-path"].toString() != "")
+        {
+            project_path = object["config-path"].toString();
+        }
     }
 }
 
@@ -446,7 +470,7 @@ void MainWindow::saveEvolution()
         stream <<"pBrainMutate="<< ui->spin_pbrainmutate->value() << endl;
         stream <<"brainSigma="<< ui->spin_brainsigma->value() << endl;
         stream <<"pBrainCrossover="<< ui->spin_pbraincrossover->value() << endl;
-        stream <<"addBodyPart="<< "All" << endl;
+        stream <<"addBodyPart="<< "All" << endl;                                        ///TODO: Add to config
         stream <<"pNodeInsert=" << ui->spin_pnodeinsert->value() << endl;
         stream <<"pSubtreeRemove=" << ui->spin_psubtreeremove->value() << endl;
         stream <<"pSubtreeDuplicate=" << ui->spin_psubtreeduplicate->value() << endl;
