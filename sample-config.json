@@ -1,5 +1,5 @@
 {
-	"__comment:" : "This set the path to the robogen build folder on the next line",
+	"__comment:" : "Set the path to the robogen build folder on the next line",
 	"build-path" : "/home/nodachi/apps/robogen/build", 
 
 	"__comment:" : "Set the path where you want the output to go (GenerationBest-#.json ...)",
