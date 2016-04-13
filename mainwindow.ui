@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -482,6 +482,9 @@
         </item>
         <item row="0" column="2">
          <widget class="QCheckBox" name="check_customscenario">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Use Custom</string>
           </property>
@@ -684,10 +687,17 @@
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="QLineEdit" name="line_scenario"/>
+         <widget class="QLineEdit" name="line_scenario">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item row="0" column="4">
          <widget class="QPushButton" name="push_browsescenario">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Browse</string>
           </property>
@@ -1216,11 +1226,17 @@
    </property>
   </action>
   <action name="action_loadevolution">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Evolution</string>
    </property>
   </action>
   <action name="action_loadsimulation">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Simulation</string>
    </property>

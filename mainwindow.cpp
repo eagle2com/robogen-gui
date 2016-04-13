@@ -238,6 +238,9 @@ void MainWindow::loadEvolution()
 void MainWindow::loadRobot()
 {
     QString filename = QFileDialog::getOpenFileName(this, "", project_path);
+    if(filename == "")
+        return;
+
     QString extension;
     {
         QStringList tokens = filename.split('.');
@@ -251,80 +254,87 @@ void MainWindow::loadRobot()
     }
 
     QFile file(filename);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream in(&file);
-    QString line;
 
-    ui->robotConfigTree->clear();
-    robot_part_hash.clear();
-
-    root_part = new RobotPart;
-    root_part->type = PART_TYPE::CORE_COMPONENT;
-
-    in.readLine();
-    RobotPart* current_parent = root_part;
-    RobotPart *new_part;
-    RobotPart *prev_part;
-    int tabs = 1;
-
-    while(in.readLineInto(&line) && !line.isEmpty())
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QStringList tokens = line.split(QRegularExpression("[ \t]"));
-        int ctabs = 0;
-        qDebug() << tokens;
-        while(tokens.front().isEmpty())
-        {
-            ctabs++;
-            tokens.pop_front();
-        }
+        QTextStream in(&file);
+        QString line;
 
-        new_part = new RobotPart;
+        ui->robotConfigTree->clear();
+        robot_part_hash.clear();
 
-        new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
-        QString type = tokens.front(); tokens.pop_front();
+        root_part = new RobotPart;
+        root_part->type = PART_TYPE::CORE_COMPONENT;
 
-        new_part->type = typeFromString(type);
-        new_part->name = tokens.front(); tokens.pop_front();
-        new_part->rotation = tokens.front().toInt(); tokens.pop_front();
+        in.readLine();
+        RobotPart* current_parent = root_part;
+        RobotPart *new_part;
+        RobotPart *prev_part;
+        int tabs = 1;
 
-        if(new_part->type == PART_TYPE::PARAMETRIC_JOINT)
+        while(in.readLineInto(&line) && !line.isEmpty())
         {
-            new_part->param_length = tokens.front().toDouble(); tokens.pop_front();
-            new_part->param_rotation = tokens.front().toDouble(); tokens.pop_front();
-            // We leave the last 0 to rot because we dont need it
-        }
-
-        if(ctabs == tabs)
-        {
-            current_parent->addChild(new_part);
-        }
-        else if(ctabs > tabs)
-        {
-            tabs = ctabs;
-            prev_part->addChild(new_part);
-            current_parent = prev_part;
-        }
-        else
-        {
-            while(ctabs < tabs)
+            QStringList tokens = line.split(QRegularExpression("[ \t]"));
+            int ctabs = 0;
+            qDebug() << tokens;
+            while(tokens.front().isEmpty())
             {
-                current_parent = (RobotPart*)current_parent->parent();
-                tabs--;
+                ctabs++;
+                tokens.pop_front();
             }
 
-            tabs = ctabs;
-            current_parent->addChild(new_part);
+            new_part = new RobotPart;
+
+            new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
+            QString type = tokens.front(); tokens.pop_front();
+
+            new_part->type = typeFromString(type);
+            new_part->name = tokens.front(); tokens.pop_front();
+            new_part->rotation = tokens.front().toInt(); tokens.pop_front();
+
+            if(new_part->type == PART_TYPE::PARAMETRIC_JOINT)
+            {
+                new_part->param_length = tokens.front().toDouble(); tokens.pop_front();
+                new_part->param_rotation = tokens.front().toDouble(); tokens.pop_front();
+                // We leave the last 0 to rot because we dont need it
+            }
+
+            if(ctabs == tabs)
+            {
+                current_parent->addChild(new_part);
+            }
+            else if(ctabs > tabs)
+            {
+                tabs = ctabs;
+                prev_part->addChild(new_part);
+                current_parent = prev_part;
+            }
+            else
+            {
+                while(ctabs < tabs)
+                {
+                    current_parent = (RobotPart*)current_parent->parent();
+                    tabs--;
+                }
+
+                tabs = ctabs;
+                current_parent->addChild(new_part);
+            }
+
+            new_part->update();
+            robot_part_hash.insert(new_part->name, new_part);
+            root_part->update();
+
+            prev_part = new_part;
         }
 
-        new_part->update();
-        robot_part_hash.insert(new_part->name, new_part);
-        root_part->update();
-
-        prev_part = new_part;
+        ui->robotConfigTree->addTopLevelItem(root_part);
+        ui->robotConfigTree->expandAll();
     }
-
-    ui->robotConfigTree->addTopLevelItem(root_part);
-    ui->robotConfigTree->expandAll();
+    else
+    {
+        qDebug() << "FAILED TO OPEN ROBOT FILE: " << filename <<endl;
+    }
 }
 
 void MainWindow::loadRobotJson(QString filename)
