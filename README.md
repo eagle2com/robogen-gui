@@ -16,9 +16,9 @@ QT gui for interfacing with the robogen framework: www.robogen.org
 - If everything is setup correctly, GenerationBest-#.json entries should appear in the list on the right.
 - Click on any of them and hit Simulate to preview the best robot of the selected generation
 - After the evolution finished, you can go to the analyze tab and hit Analyze to plot the graph of the generation stats.
-- Don't load .txt files with brains defined in them, .json are OK.
 - The evolution can be easily parallelized up to the number of logical cores of your CPU - 1 (to not freeze your PC) in the evolve tab.
 - (Output from the servers is piped to stdout)
+- The robot limbs can be fully edited in Robot tab. Just make sure the configuration is valid, as there are no checks in place yet. (Don't put two parts on the same face for example). The parts can be drag-n-dropped to the appropriate parent. You can also load a robot configuration with load->robot. Please don't load `.txt` with brains in them. `.json` are ok
 - You can do all of this with a .json config file that you can load from file->load config. Have a look at sample-config.json for the contents. If the filename is _config.json_ and it is in the launch directory of robogen-gui, it will load it automaticaly at startup . All that is left to do is hit the big save once, and then hit evolve. You have to save everytime you make a modification to the robot/evolution/simulation configuration.
 
 ## Issues
