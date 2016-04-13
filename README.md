@@ -6,22 +6,22 @@ QT gui for interfacing with the robogen framework: www.robogen.org
 - Open .pro in qtcreator, build, run
 
 ## Usage
-- Make sure you have downloaded and compiled robogen from www.robogen.org
+**Read the last point before doing anything**
+- Make sure you have downloaded and compiled robogen from www.robogen.org 
 - Launch robogen-gui
 - Settings tab: set the path to the robogen build folder
-- Evolution Config tab: change evolution mode to full (the default robot is only one CoreComponent and nothing would happen in brain-only evolution)
 - Hit the big save button on the bottom and select where you want robogen-gui to save the robot/simulation/evolution config files
-- Evolve/Simulate tab: set the output directory to where you want the evolve output files to go to (GenerationBest-#.json, ....)
+- Evolve/Simulate tab: set the output directory to where you want the evolve output files to go to (GenerationBest-#.json, ....), the folder will be overwritten every time (todo: maybe add a checkbox for that? )
 - Evolve Simulate tab: hit Evolve!
-- If everything is setup correctly, GenerationBest-#.json lentries should appear in the list on the right.
+- If everything is setup correctly, GenerationBest-#.json entries should appear in the list on the right.
 - Click on any of them and hit Simulate to preview the best robot of the selected generation
 - After the evolution finished, you can go to the analyze tab and hit Analyze to plot the graph of the generation stats.
-- DONT use any of the menubar buttons except for the load->robot one. Also don't load .txt files with brains defined in them, .json are OK.
+- Don't load .txt files with brains defined in them, .json are OK.
+- You can do all of this with a .json config file that you can load from file->load config. Have a look at sample-config.json for the contents. If the filename is _config.json_ and it is in the launch directory of robogen-gui, it will load it automaticaly at startup . All that is left to do is hit the big save once, and then hit evolve. You have to save everytime you make a modification to the robot/evolution/simulation configuration.
 
 ## Issues
 - If Evolve stops before reaching the max generations, it is possible that mutations created an unusable configuration (robogen issue)
 - It is also possible that the output analysis failed for some reason
 
 ## TODO
-- Add a default config file so we don't have to set directories each time (project-like?)
 - Brains
