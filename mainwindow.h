@@ -131,6 +131,7 @@ public slots:
     void loadEvolution();
     void loadRobot();
     void loadRobotJson(QString filename);
+    void loadConfig();
 
     void saveSimulation();
     void saveEvolution();
@@ -153,12 +154,7 @@ private:
     Ui::MainWindow *ui;
 
     RobotPart *root_part;
-    QString evolution_filename;
-    QString simulation_filename;
-    QString robot_filename;
-    QString robogen_path;
     QString project_path;
-    QString evolve_path;
 
     QProcess *process_server;
     QProcess *process_evolve;
