@@ -1,5 +1,10 @@
 {
-	"build-path" : "/home/nodachi/apps/robogen/build",
+	"__comment:" : "This set the path to the robogen build folder on the next line",
+	"build-path" : "/home/nodachi/apps/robogen/build", 
+
+	"__comment:" : "Set the path where you want the output to go (GenerationBest-#.json ...)",
 	"output-path" : "/home/nodachi/dev/robogen-gui/output/exp2",
+
+	"__comment:" : "Set the path where you want robogen-gui to save the configuration files (it will create sim.txt, evo.txt and robot.txt)",
 	"config-path" : "/home/nodachi/dev/robogen-gui/output"
 }
