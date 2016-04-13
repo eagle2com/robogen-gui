@@ -52,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(onLoadConfig()));
 
+    connect(ui->push_stop, SIGNAL(clicked(bool)), this, SLOT(onPushStop()));
+
     RobotPart *part = new RobotPart;
     part->name = "ROOT";
     part->type = PART_TYPE::CORE_COMPONENT;
@@ -787,6 +789,15 @@ void MainWindow::onPushAnalyze()
     customPlot->show();
 
     qDebug() << "PLOTTING" << v_best.length();
+}
+
+void MainWindow::onPushStop()
+{
+    ///TODO: Do this cleanly by pushing QProcess-es into a list and killing them
+    QString program = "killall";
+    QStringList arguments = {"-9","robogen-server"};
+    QProcess *killall = new QProcess(this);
+    killall->start(program, arguments);
 }
 
 void MainWindow::evolveReadReady()

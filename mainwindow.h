@@ -148,6 +148,7 @@ public slots:
     void onPushEvolve();
     void onPushSimulate();
     void onPushAnalyze();
+    void onPushStop();
 
     void evolveReadReady();
     void onEvolveFinished(int);

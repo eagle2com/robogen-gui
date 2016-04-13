@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -1070,6 +1070,13 @@
             <widget class="QLabel" name="label_15">
              <property name="text">
               <string>Generation Progress</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="push_stop">
+             <property name="text">
+              <string>STOP</string>
              </property>
             </widget>
            </item>
