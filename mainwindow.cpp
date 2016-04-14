@@ -649,19 +649,21 @@ void MainWindow::onPushEvolve()
             arguments.clear();
             arguments << QString::number(8000 + i + 1);
             QProcess *process = new QProcess(this);
+           // process->setProcessChannelMode(QProcess::ForwardedChannels);
             process->start(program, arguments);
             process_list.push_back(process);
 
-            qDebug() << "Launching server #" << i + 1 << endl;;
+            //qDebug() << "Launching server #" << i + 1 << endl;;
         }
 
         arguments.clear();
         arguments << QString::number(8000 + ui->spin_threads->value());
         QProcess *process = new QProcess(this);
+       // process->setProcessChannelMode(QProcess::ForwardedChannels);
         process->start(program, arguments);
         process_list.push_back(process);
 
-        qDebug() << "Launching server #" << ui->spin_threads->value() << endl;
+        //qDebug() << "Launching server #" << ui->spin_threads->value() << endl;
     }
 
     // Launch an evolution
@@ -681,13 +683,11 @@ void MainWindow::onPushEvolve()
         ui->progress_generation->setMaximum(ui->spin_generations->value());
         ui->progress_generation->setValue(0);
         process_evolve = new QProcess(this);
+        process_evolve->setProcessChannelMode(QProcess::ForwardedErrorChannel);
         process_evolve->start(program, arguments);
+
         connect(process_evolve, SIGNAL(finished(int)), this, SLOT(onEvolveFinished(int)));
-        connect(process_evolve, SIGNAL(readyRead()), this, SLOT(evolveReadReady()) );
     }
-
-
-
 }
 
 void MainWindow::onPushSimulate()
