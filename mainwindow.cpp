@@ -625,7 +625,6 @@ void MainWindow::onPushEvolve()
 
     dir.removeRecursively();
 
-
     if(ui->edit_robogenpath->text().isEmpty())
     {
         QMessageBox msgBox(this);
@@ -637,6 +636,10 @@ void MainWindow::onPushEvolve()
 
     ui->push_evolve->setDisabled(true);
 
+    // Make sure to kill any running servers to avoid conflicts
+    ///FIXME: Maybe move the killing into a separate method and keep the callback just for the button press?
+    onPushStop();
+
     // Launch the server(s)
     {
         QString program = ui->edit_robogenpath->text() + "/robogen-server";
@@ -645,16 +648,18 @@ void MainWindow::onPushEvolve()
         {
             arguments.clear();
             arguments << QString::number(8000 + i + 1);
-            process_server = new QProcess(this);
-            process_server->start(program, arguments);
+            QProcess *process = new QProcess(this);
+            process->start(program, arguments);
+            process_list.push_back(process);
 
             qDebug() << "Launching server #" << i + 1 << endl;;
         }
 
         arguments.clear();
         arguments << QString::number(8000 + ui->spin_threads->value());
-        process_server = new QProcess(this);
-        process_server->start(program, arguments);
+        QProcess *process = new QProcess(this);
+        process->start(program, arguments);
+        process_list.push_back(process);
 
         qDebug() << "Launching server #" << ui->spin_threads->value() << endl;
     }
@@ -793,11 +798,13 @@ void MainWindow::onPushAnalyze()
 
 void MainWindow::onPushStop()
 {
-    ///TODO: Do this cleanly by pushing QProcess-es into a list and killing them
-    QString program = "killall";
-    QStringList arguments = {"-9","robogen-server"};
-    QProcess *killall = new QProcess(this);
-    killall->start(program, arguments);
+    qDebug() << "Killing all servers ..." << endl;
+    for(QProcess* p: process_list)
+    {
+        p->kill();
+    }
+
+    process_list.clear();
 }
 
 void MainWindow::evolveReadReady()

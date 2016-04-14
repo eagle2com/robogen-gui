@@ -5,6 +5,7 @@
 #include <QTreeWidget>
 #include <QProcess>
 #include <QHash>
+#include <QList>
 
 enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
@@ -162,6 +163,8 @@ private:
     QProcess *process_server;
     QProcess *process_evolve;
     QProcess *process_simulate;
+
+    QList<QProcess*> process_list;
 
     QHash<QString, RobotPart*> robot_part_hash;
 
