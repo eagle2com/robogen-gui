@@ -15,7 +15,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    dir_watcher(this)
 {
     ui->setupUi(this);
 
@@ -53,6 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(onLoadConfig()));
 
     connect(ui->push_stop, SIGNAL(clicked(bool)), this, SLOT(onPushStop()));
+
+    connect(&dir_watcher, SIGNAL(onNewFile(QStringList)), this, SLOT(onNewFileList(QStringList)));
 
     RobotPart *part = new RobotPart;
     part->name = "ROOT";
@@ -539,7 +542,7 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     }
     name = part->name;
     if(name.isEmpty())
-        name = "PARTGEN_" + QString::number((long int)part);
+        name = "PARTGEN_" + QString::number((int)part);
 
     stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
     if(part->type == PART_TYPE::PARAMETRIC_JOINT)
@@ -609,6 +612,9 @@ void MainWindow::browseCustomScenario()
 
 void MainWindow::onPushEvolve()
 {   
+    if(fs_watcher)
+        delete fs_watcher;
+
     if(ui->line_evolve->text().isEmpty())
     {
         QMessageBox msgBox(this);
@@ -622,8 +628,6 @@ void MainWindow::onPushEvolve()
     if (!dir.exists()) {
         dir.mkpath(".");
     }
-
-    dir.removeRecursively();
 
     if(ui->edit_robogenpath->text().isEmpty())
     {
@@ -675,7 +679,7 @@ void MainWindow::onPushEvolve()
             seed = QString::number(qrand());
         else
             seed = QString::number(ui->spin_seed->value());
-        arguments << seed << ui->line_evolve->text() << project_path + "/evo.txt";
+        arguments << seed << ui->line_evolve->text() << project_path + "/evo.txt" << "--overwrite";
         qDebug() << "arguments: " << arguments << endl;
 
         n_generation = 0;
@@ -687,21 +691,33 @@ void MainWindow::onPushEvolve()
         process_evolve->start(program, arguments);
 
         connect(process_evolve, SIGNAL(finished(int)), this, SLOT(onEvolveFinished(int)));
+        process_evolve->waitForStarted();
     }
+
+    // Create file system watcher so we can check for new generations
+    /*{
+        fs_watcher = new QFileSystemWatcher;
+        fs_watcher->addPath(ui->line_evolve->text() + "/../");
+        connect(fs_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onFileChanged(QString)));
+        qDebug() << "watching " << fs_watcher->directories() << endl;
+    }*/
+
+    dir_watcher.watch(ui->line_evolve->text(),500);
 }
 
 void MainWindow::onPushSimulate()
 {
     QString program = ui->edit_robogenpath->text() + "/robogen-file-viewer";
     QStringList arguments;
-    QString path = ui->line_evolve->text() + "/" + ui->list_generationsbest->currentItem()->text();
-    arguments << path << project_path + "/sim.txt";
-    process_simulate = new QProcess(this);
-    process_simulate->setWorkingDirectory(ui->edit_robogenpath->text());
-    process_simulate->start(program, arguments);
-
-    //qDebug() << process_simulate->readAll() << endl;
-
+    QListWidgetItem *current = ui->list_generationsbest->currentItem();
+    if(current)
+    {
+        QString path = ui->line_evolve->text() + "/" + current->text();
+        arguments << path << project_path + "/sim.txt";
+        process_simulate = new QProcess(this);
+        process_simulate->setWorkingDirectory(ui->edit_robogenpath->text());
+        process_simulate->start(program, arguments);
+    }
 }
 
 void MainWindow::onPushAnalyze()
@@ -805,6 +821,24 @@ void MainWindow::onPushStop()
     }
 
     process_list.clear();
+}
+
+void MainWindow::onFileChanged(QString filename)
+{
+    ui->list_generationsbest->addItem(filename);
+    if(filename.startsWith("Generation"))
+    {
+        ui->list_generationsbest->addItem(filename);
+    }
+}
+
+void MainWindow::onNewFileList(QStringList files)
+{
+    qDebug() << files << endl;
+    auto index = ui->list_generationsbest->currentIndex();
+    ui->list_generationsbest->clear();
+    ui->list_generationsbest->addItems(files);
+    ui->list_generationsbest->setCurrentIndex(index);
 }
 
 void MainWindow::evolveReadReady()

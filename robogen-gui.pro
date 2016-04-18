@@ -11,14 +11,18 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = robogen-gui
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -std=c++11
+!win32 {
+    QMAKE_CXXFLAGS += -std=c++11
+}
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    dirwatcher.cpp
 
 HEADERS  += mainwindow.h \
-    qcustomplot.h
+    qcustomplot.h \
+    dirwatcher.h
 
 FORMS    += mainwindow.ui
 

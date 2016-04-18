@@ -6,6 +6,8 @@
 #include <QProcess>
 #include <QHash>
 #include <QList>
+#include <QFileSystemWatcher>
+#include "dirwatcher.h"
 
 enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
@@ -150,6 +152,8 @@ public slots:
     void onPushSimulate();
     void onPushAnalyze();
     void onPushStop();
+    void onFileChanged(QString filename);
+    void onNewFileList(QStringList files);
 
     void evolveReadReady();
     void onEvolveFinished(int);
@@ -168,9 +172,13 @@ private:
 
     QHash<QString, RobotPart*> robot_part_hash;
 
+    QFileSystemWatcher *fs_watcher = nullptr;
+
     PART_TYPE typeFromString(QString str);
 
     int n_generation;
+
+    DirWatcher dir_watcher;
 };
 
 #endif // MAINWINDOW_H
