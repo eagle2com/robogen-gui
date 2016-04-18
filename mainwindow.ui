@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -34,7 +34,7 @@
            <double>0.010000000000000</double>
           </property>
           <property name="value">
-           <double>0.600000000000000</double>
+           <double>0.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -149,7 +149,7 @@
         <item row="3" column="6">
          <widget class="QComboBox" name="combo_evolutionmode">
           <property name="currentText">
-           <string>full</string>
+           <string>brain</string>
           </property>
           <item>
            <property name="text">
@@ -1183,7 +1183,7 @@
      <x>0</x>
      <y>0</y>
      <width>896</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
