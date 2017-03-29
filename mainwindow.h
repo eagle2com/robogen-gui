@@ -9,7 +9,7 @@
 #include <QFileSystemWatcher>
 #include "dirwatcher.h"
 
-enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR};
+enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR, ACTIVE_WHEEL, PASSIVE_WHEEL};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
 
 
@@ -72,6 +72,12 @@ public:
             break;
         case PART_TYPE::IR_SENSOR:
             icon = QIcon(":/imgs/IrSensor");
+            break;
+        case PART_TYPE::ACTIVE_WHEEL:
+            icon = QIcon(":/imgs/ActiveHinge");
+            break;
+        case PART_TYPE::PASSIVE_WHEEL:
+            icon = QIcon(":/imgs/PassiveHinge");
             break;
         default:
             break;

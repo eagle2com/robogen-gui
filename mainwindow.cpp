@@ -12,6 +12,8 @@
 #include <qcustomplot.h>
 
 #include <stdio.h>
+#include <iostream>
+using std::cout;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -89,6 +91,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->robotPartCombo->addItem("Ir Sensor");
     ui->robotPartCombo->setItemIcon(6, QIcon(":/imgs/IrSensor"));
+
+    ui->robotPartCombo->addItem("Active Wheel");
+    ui->robotPartCombo->setItemIcon(7, QIcon(":/imgs/ActiveHinge"));
+
+    ui->robotPartCombo->addItem("Passive Wheel");
+    ui->robotPartCombo->setItemIcon(8, QIcon(":/imgs/PassiveHinge"));
 
     ui->spin_threads->setMinimum(1);
     ui->spin_threads->setMaximum(QThread::idealThreadCount()-1);
@@ -344,12 +352,20 @@ void MainWindow::loadRobot()
 
 void MainWindow::loadRobotJson(QString filename)
 {
+    qDebug() << "Opening robot json config: " << filename << " ... ";
     QFile file(filename);
-    file.open(QIODevice::ReadOnly);
+    if(!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "[FAIL]" << endl;
+        return;
+    }
+    qDebug() << "[ OK ]";
+
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
     QJsonObject object = doc.object();
 
     QJsonArray parts = object["body"].toObject()["part"].toArray();
+
+    qDebug() << "Found " << parts.size() << " parts";
 
     QHash<QString, RobotPart*> hash;
 
@@ -359,9 +375,12 @@ void MainWindow::loadRobotJson(QString filename)
         RobotPart *new_part = new RobotPart;
         new_part->name = part.toObject()["id"].toString();
         new_part->type = typeFromString(part.toObject()["type"].toString());
+        qDebug() << "type string: " << part.toObject()["type"].toString();
         new_part->rotation = part.toObject()["orientation"].toInt();
         if(new_part->type == PART_TYPE::CORE_COMPONENT)
             new_root_part = new_part;
+
+        qDebug() << "part: NAME='" << new_part->name << "' type='" << (int)new_part->type << "' rotation='" << new_part->rotation;
         hash.insert(new_part->name, new_part);
     }
 
@@ -374,7 +393,7 @@ void MainWindow::loadRobotJson(QString filename)
         parent->addChild(child);
         child->update();
     }
-
+    qDebug() << "Root part:" << new_root_part->name << endl;
     root_part = new_root_part;
     root_part->update();
     ui->robotConfigTree->clear();
@@ -456,6 +475,7 @@ void MainWindow::saveSimulation()
         stream <<"sensorNoiseLevel="<< ui->spin_sensornoiselevel->value() << endl;
         stream <<"motorNoiseLevel="<< ui->spin_motornoiselevel->value() << endl;
         stream <<"capAcceleration="<< (ui->check_capacceleration->isChecked() ? "true": "false") << endl;
+        stream <<"obstaclesConfigFile="<< project_path+"simpleArena.txt" << endl;
     }
     else
     {
@@ -495,6 +515,13 @@ void MainWindow::saveEvolution()
         stream <<"brainBounds=-3:3" << endl;                                            ///TODO: Add to configurations
         stream <<"pAddHiddenNeuron=" << ui->spin_paddhiddenneuron->value() << endl;
         stream <<"maxBodyParts=" << ui->spin_maxbodyparts->value() << endl;
+        if(ui->combo_evolutionmode->currentText() == "full" && ui->combo_evolutionaryalgorithm->currentText() == "HyperNEAT") {
+            stream <<"evolutionaryAlgorithm=" << "Basic" << endl;    // Basic, HyperNEAT
+            qDebug() << "WARNING: HyperNEAT cannot be used with full evolutions, setting to Basic" << endl;
+        }
+        else {
+            stream <<"evolutionaryAlgorithm=" << ui->combo_evolutionaryalgorithm->currentText() << endl;    // Basic, HyperNEAT
+        }
 
         for(int i = 0; i < ui->spin_threads->value(); i++)
         {
@@ -534,6 +561,12 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     case PART_TYPE::IR_SENSOR:
         type = "IrSensor";
         break;
+    case PART_TYPE::ACTIVE_WHEEL:
+        type = "ActiveWheel";
+        break;
+    case PART_TYPE::PASSIVE_WHEEL:
+        type = "PassiveWheel";
+        break;
     }
 
     for(int i = 0; i < tab; i++)
@@ -542,13 +575,19 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     }
     name = part->name;
     if(name.isEmpty())
-        name = "PARTGEN_" + QString::number((int)part);
+        name = "PARTGEN_" + QString::number((ulong)part);
 
     stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
     if(part->type == PART_TYPE::PARAMETRIC_JOINT)
     {
         // The last param is the inclination, which is disabled for now and force to 0
         stream << " " << part->param_length << " " << part->param_rotation <<" 0";
+    }
+    //FIXME Dirty hack
+    if(part->type == PART_TYPE::ACTIVE_WHEEL || part->type == PART_TYPE::PASSIVE_WHEEL)
+    {
+        // radius?
+        stream << " " << 0.04;
     }
     stream << endl;
 
@@ -567,6 +606,9 @@ void MainWindow::saveRobot()
     {
         QTextStream stream( &file );
         writeRobotPart(root_part, 0, stream);
+        //FIXME Dirty hack
+        stream << "\n\n\nLeftWheel 0 100" << endl;
+        stream << "RightWheel 0 -100" << endl;
     }
     else
     {
@@ -653,7 +695,7 @@ void MainWindow::onPushEvolve()
             arguments.clear();
             arguments << QString::number(8000 + i + 1);
             QProcess *process = new QProcess(this);
-           // process->setProcessChannelMode(QProcess::ForwardedChannels);
+            process->setProcessChannelMode(QProcess::ForwardedChannels);
             process->start(program, arguments);
             process_list.push_back(process);
 
@@ -663,7 +705,7 @@ void MainWindow::onPushEvolve()
         arguments.clear();
         arguments << QString::number(8000 + ui->spin_threads->value());
         QProcess *process = new QProcess(this);
-       // process->setProcessChannelMode(QProcess::ForwardedChannels);
+        process->setProcessChannelMode(QProcess::ForwardedChannels);
         process->start(program, arguments);
         process_list.push_back(process);
 
@@ -834,7 +876,7 @@ void MainWindow::onFileChanged(QString filename)
 
 void MainWindow::onNewFileList(QStringList files)
 {
-    qDebug() << files << endl;
+   // qDebug() << files << endl;
     auto index = ui->list_generationsbest->currentIndex();
     ui->list_generationsbest->clear();
     ui->list_generationsbest->addItems(files);
@@ -864,7 +906,7 @@ void MainWindow::onEvolveFinished(int)
 
 PART_TYPE MainWindow::typeFromString(QString str)
 {
-    PART_TYPE type;
+    PART_TYPE type = PART_TYPE::PASSIVE_HINGE;
 
     if(str == "FixedBrick")
         type = PART_TYPE::FIXED_BRICK;
@@ -883,6 +925,18 @@ PART_TYPE MainWindow::typeFromString(QString str)
 
     else if(str == "ParametricJoint")
         type = PART_TYPE::PARAMETRIC_JOINT;
+
+    else if(str == "CoreComponent")
+        type = PART_TYPE::CORE_COMPONENT;
+
+    else if(str == "ActiveWheel")
+        type = PART_TYPE::ACTIVE_WHEEL;
+
+    else if(str == "PassiveWheel")
+        type = PART_TYPE::PASSIVE_WHEEL;
+    else {
+        qDebug() << "ERROR: Part type '" << str << "' is  unupported";
+    }
 
     return type;
 }
