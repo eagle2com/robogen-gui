@@ -7,111 +7,17 @@
 #include <QHash>
 #include <QList>
 #include <QFileSystemWatcher>
+#include <QJsonObject>
 #include "dirwatcher.h"
 
-enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR, ACTIVE_WHEEL, PASSIVE_WHEEL};
-enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
+#include "robotconfigform.h"
+#include "simulationconfigform.h"
+#include "evolutionconfigform.h"
+#include "configoverviewform.h"
+#include "settingswindow.h"
 
+#include "configurations.h"
 
-
-class RobotPart: public QTreeWidgetItem
-{
-public:
-    QString name = "";
-    PART_TYPE type = PART_TYPE::FIXED_BRICK;
-    PART_FACE face = PART_FACE::FRONT;
-    int rotation = 0;
-    int    param_rotation = 0;
-    double param_length = 0.02;
-
-    RobotPart(): QTreeWidgetItem()
-    {
-        this->update();
-
-    }
-
-    void update()
-    {
-        QString face_str;
-        switch (face) {
-        case PART_FACE::FRONT:
-            face_str = " @FRONT";
-            break;
-        case PART_FACE::BACK:
-            face_str = " @BACK";
-            break;
-        case PART_FACE::RIGHT:
-            face_str = " @RIGHT";
-            break;
-        case PART_FACE::LEFT:
-            face_str = " @LEFT";
-            break;
-        default:
-            break;
-        }
-
-        QIcon icon;
-        switch (type) {
-        case PART_TYPE::CORE_COMPONENT:
-            icon = QIcon(":/imgs/CoreComponent");
-            break;
-        case PART_TYPE::FIXED_BRICK:
-            icon = QIcon(":/imgs/FixedBrick");
-            break;
-        case PART_TYPE::ACTIVE_HINGE:
-            icon = QIcon(":/imgs/ActiveHinge");
-            break;
-        case PART_TYPE::PASSIVE_HINGE:
-            icon = QIcon(":/imgs/PassiveHinge");
-            break;
-        case PART_TYPE::PARAMETRIC_JOINT:
-            icon = QIcon(":/imgs/ParametricJoint");
-            break;
-        case PART_TYPE::LIGHT_SENSOR:
-            icon = QIcon(":/imgs/LightSensor");
-            break;
-        case PART_TYPE::IR_SENSOR:
-            icon = QIcon(":/imgs/IrSensor");
-            break;
-        case PART_TYPE::ACTIVE_WHEEL:
-            icon = QIcon(":/imgs/ActiveHinge");
-            break;
-        case PART_TYPE::PASSIVE_WHEEL:
-            icon = QIcon(":/imgs/PassiveHinge");
-            break;
-        default:
-            break;
-        }
-
-        QString final_name = "";
-
-        if(name == "")
-            final_name = "<NONAME>";
-        else
-            final_name = name;
-
-        QString rot_str;
-        switch(rotation)
-        {
-        case 0:
-            rot_str = " +0°";
-            break;
-        case 1:
-            rot_str = " +90°";
-            break;
-        case 2:
-            rot_str = " +180°";
-            break;
-        case 3:
-            rot_str = " +270°";
-            break;
-        }
-
-        this->setText(0, final_name + face_str + rot_str);
-        this->setIcon(0, icon);
-
-    }
-};
 
 namespace Ui {
 class MainWindow;
@@ -126,15 +32,9 @@ public:
     ~MainWindow();
 
 public slots:
-    void onAddPart();
-    void onRemovePart();
-    void onItemChange(QTreeWidgetItem *, QTreeWidgetItem *);
-    void onRobotPartChange(int index);
-    void onRobotFaceChange(int index);
-    void onRobotPartNameChange(QString name);
-    void onRobotRotationChange(int index);
-    void onRobotParamLengthChange(double value);
-    void onRobotParamRotationChange(int value);
+    void onProjectTreeSelect(QTreeWidgetItem*,int);
+    void onProjectTreeAdd();
+    void onProjectTreeRemove();
 
     void loadSimulation();
     void loadEvolution();
@@ -143,6 +43,10 @@ public slots:
 
     void onLoadConfig();
     void loadConfig(QString default_path = "");
+
+    void saveConfig();
+    void onSaveConfig();
+    void onSaveConfigAs();
 
     void saveSimulation();
     void saveEvolution();
@@ -164,10 +68,16 @@ public slots:
     void evolveReadReady();
     void onEvolveFinished(int);
 
+    void onFileEvent(const QString &);
+
+    void onNewProject();
+    void onOpenProject();
+    void onSaveProject();
+
 private:
     Ui::MainWindow *ui;
 
-    RobotPart *root_part;
+
     QString project_path;
 
     QProcess *process_server;
@@ -176,15 +86,19 @@ private:
 
     QList<QProcess*> process_list;
 
-    QHash<QString, RobotPart*> robot_part_hash;
-
     QFileSystemWatcher *fs_watcher = nullptr;
-
-    PART_TYPE typeFromString(QString str);
 
     int n_generation;
 
-    DirWatcher dir_watcher;
+    QString project_directory = "";
+
+    QFileSystemWatcher* tmp_directory_watcher = nullptr;
+
+    SimulationConfigForm *simulation_config_form = nullptr;
+    EvolutionConfigForm* evolution_config_form = nullptr;
+    RobotConfigForm* robot_config_form = nullptr;
+    ConfigOverviewForm* overview_form = nullptr;
+    SettingsWindow* settings_window = nullptr;
 };
 
 #endif // MAINWINDOW_H

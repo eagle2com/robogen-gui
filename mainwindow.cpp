@@ -13,27 +13,50 @@
 
 #include <stdio.h>
 #include <iostream>
+
 using std::cout;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    dir_watcher(this)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    connect(ui->button_add_part, SIGNAL(clicked(bool)), this, SLOT(onAddPart()));
+    simulation_config_form = new SimulationConfigForm();
+    robot_config_form = new RobotConfigForm();
+    evolution_config_form = new EvolutionConfigForm();
+    overview_form = new ConfigOverviewForm();
+    settings_window = new SettingsWindow(this);
+    settings_window->hide();
+
+    ui->main_frame->setLayout(new QGridLayout());
+
+    ui->main_frame->layout()->addWidget(simulation_config_form);
+    ui->main_frame->layout()->addWidget(robot_config_form);
+    ui->main_frame->layout()->addWidget(evolution_config_form);
+    ui->main_frame->layout()->addWidget(overview_form);
+
+    simulation_config_form->hide();
+    evolution_config_form->hide();
+    robot_config_form->hide();
+
+    connect(ui->tree_project, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
+    connect(ui->tree_project, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
+    connect(ui->tree_project, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
+
+    connect(ui->push_add, SIGNAL(pressed()), this, SLOT(onProjectTreeAdd()));
+    connect(ui->push_remove, SIGNAL(pressed()), this, SLOT(onProjectTreeRemove()));
+
+    connect(ui->action_new_project, SIGNAL(triggered()), this, SLOT(onNewProject()));
+    connect(ui->action_open_project, SIGNAL(triggered()), this, SLOT(onOpenProject()));
+    connect(ui->action_save_project, SIGNAL(triggered()), this, SLOT(onSaveProject()));
+
+    connect(ui->action_settings, SIGNAL(triggered()), settings_window, SLOT(show()));
+
+
+    /*
+
     connect(ui->robotConfigTree, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onItemChange(QTreeWidgetItem*,QTreeWidgetItem*)));
-
-    connect(ui->robotPartCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onRobotPartChange(int)));
-    connect(ui->robotFaceCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onRobotFaceChange(int)));
-    connect(ui->robotRotateCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onRobotRotationChange(int)));
-    connect(ui->spin_paramlength, SIGNAL(valueChanged(double)), this, SLOT(onRobotParamLengthChange(double)));
-    connect(ui->spin_paramrotation, SIGNAL(valueChanged(int)), this, SLOT(onRobotParamRotationChange(int)));
-
-    connect(ui->robotPartNameEdit, SIGNAL(textEdited(QString)), this, SLOT(onRobotPartNameChange(QString)));
-
-    connect(ui->button_remove_part, SIGNAL(clicked(bool)), this, SLOT(onRemovePart()));
 
     connect(ui->action_loadsimulation, SIGNAL(triggered(bool)), this, SLOT(loadSimulation()));
     connect(ui->action_loadevolution, SIGNAL(triggered(bool)), this, SLOT(loadEvolution()));
@@ -43,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //connect(ui->action_saveevolution, SIGNAL(triggered(bool)), this, SLOT(saveEvolution()));
     //connect(ui->action_saverobot, SIGNAL(triggered(bool)), this, SLOT(saveRobot()));
 
-    connect(ui->push_saveall, SIGNAL(clicked(bool)), this, SLOT(saveAll()));
+    connect(ui->action_saveall, SIGNAL(clicked(bool)), this, SLOT(saveAll()));
 
     connect(ui->push_robogenbrowse, SIGNAL(clicked(bool)), this, SLOT(browseRobogen()));
     connect(ui->push_browseevolve, SIGNAL(clicked(bool)), this, SLOT(browseEvolve()));
@@ -54,188 +77,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->push_analyze, SIGNAL(clicked(bool)), this, SLOT(onPushAnalyze()));
 
     connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(onLoadConfig()));
+    connect(ui->action_saveconfig, SIGNAL(triggered(bool)), this, SLOT(onSaveConfig()));
+    connect(ui->action_saveconfig_as, SIGNAL(triggered(bool)), this, SLOT(onSaveConfigAs()));
 
     connect(ui->push_stop, SIGNAL(clicked(bool)), this, SLOT(onPushStop()));
 
     connect(&dir_watcher, SIGNAL(onNewFile(QStringList)), this, SLOT(onNewFileList(QStringList)));
+*/
 
-    RobotPart *part = new RobotPart;
-    part->name = "ROOT";
-    part->type = PART_TYPE::CORE_COMPONENT;
-    part->face = PART_FACE::FRONT;
-    part->update();
-
-    root_part = part;
-
-    ui->robotConfigTree->addTopLevelItem(part);
-
-    ui->robotConfigTree->expandAll();
-
-    ui->robotPartCombo->addItem("Core Component");
-    ui->robotPartCombo->setItemIcon(0, QIcon(":/imgs/CoreComponent"));
-
-    ui->robotPartCombo->addItem("Fixed Brick");
-    ui->robotPartCombo->setItemIcon(1, QIcon(":/imgs/FixedBrick"));
-
-    ui->robotPartCombo->addItem("Active Hinge");
-    ui->robotPartCombo->setItemIcon(2, QIcon(":/imgs/ActiveHinge"));
-
-    ui->robotPartCombo->addItem("Passive Hinge");
-    ui->robotPartCombo->setItemIcon(3, QIcon(":/imgs/PassiveHinge"));
-
-    ui->robotPartCombo->addItem("Parametric Joint");
-    ui->robotPartCombo->setItemIcon(4, QIcon(":/imgs/ParametricJoint"));
-
-    ui->robotPartCombo->addItem("Light Sensor");
-    ui->robotPartCombo->setItemIcon(5, QIcon(":/imgs/LightSensor"));
-
-    ui->robotPartCombo->addItem("Ir Sensor");
-    ui->robotPartCombo->setItemIcon(6, QIcon(":/imgs/IrSensor"));
-
-    ui->robotPartCombo->addItem("Active Wheel");
-    ui->robotPartCombo->setItemIcon(7, QIcon(":/imgs/ActiveHinge"));
-
-    ui->robotPartCombo->addItem("Passive Wheel");
-    ui->robotPartCombo->setItemIcon(8, QIcon(":/imgs/PassiveHinge"));
-
-    ui->spin_threads->setMinimum(1);
-    ui->spin_threads->setMaximum(QThread::idealThreadCount()-1);
-    ui->spin_threads->setValue(1);
 
     qsrand(QTime::currentTime().elapsed());
 
-    loadConfig("./config.json");
+    //loadConfig("./config.json");
+
+    onNewProject();
 }
 
-void MainWindow::onAddPart()
-{
-    RobotPart *part = new RobotPart;
-    root_part->addChild(part);
-    ui->robotConfigTree->clearSelection();
-    ui->robotConfigTree->setCurrentItem(part);
-}
 
-void MainWindow::onRemovePart()
-{
-    QTreeWidgetItem* item = ui->robotConfigTree->currentItem();
-    printf("item: %p\n", item);
-    if(!item)
-        return;
 
-    if(item == root_part)
-        return;
 
-    if(!item->parent())
-        return;
-
-    QModelIndex index =  ui->robotConfigTree->currentIndex();
-    QModelIndex index2 = index.sibling(index.row() - 1, 0);
-    ui->robotConfigTree->setCurrentIndex(index2);
-    item->parent()->removeChild(item);
-}
-
-void MainWindow::onItemChange(QTreeWidgetItem*, QTreeWidgetItem*)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    ui->robotFaceCombo->blockSignals(true);
-    ui->robotPartCombo->blockSignals(true);
-    ui->robotRotateCombo->blockSignals(true);
-    ui->robotPartNameEdit->blockSignals(true);
-    ui->spin_paramlength->blockSignals(true);
-    ui->spin_paramrotation->blockSignals(true);
-
-    ui->robotPartCombo->setCurrentIndex((int)part->type);
-    ui->robotFaceCombo->setCurrentIndex((int)part->face);
-    ui->robotRotateCombo->setCurrentIndex((int)part->rotation);
-    ui->robotPartNameEdit->setText(part->name);
-    ui->spin_paramlength->setValue(part->param_length);
-    ui->spin_paramrotation->setValue(part->param_rotation);
-
-    ui->robotFaceCombo->blockSignals(false);
-    ui->robotPartCombo->blockSignals(false);
-    ui->robotRotateCombo->blockSignals(false);
-    ui->robotPartNameEdit->blockSignals(false);
-    ui->spin_paramlength->blockSignals(false);
-    ui->spin_paramrotation->blockSignals(false);
-}
-
-void MainWindow::onRobotPartChange(int index)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    part->type = (PART_TYPE)index;
-    part->update();
-}
-
-void MainWindow::onRobotFaceChange(int index)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    part->face = (PART_FACE)index;
-    part->update();
-}
-
-void MainWindow::onRobotPartNameChange(QString name)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    part->name = name;
-    part->update();
-}
-
-void MainWindow::onRobotRotationChange(int index)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    part->rotation = index;
-    part->update();
-}
-
-void MainWindow::onRobotParamLengthChange(double value)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    if(part->type == PART_TYPE::PARAMETRIC_JOINT)
-    {
-        part->param_length = value;
-    }
-}
-
-void MainWindow::onRobotParamRotationChange(int value)
-{
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
-    if(!part)
-        return;
-
-    if(part->type == PART_TYPE::PARAMETRIC_JOINT)
-    {
-        part->param_rotation = value;
-    }
-}
-
-void MainWindow::loadSimulation()
-{
-    /*
-    QString filename = QFileDialog::getOpenFileName(this, "", simulation_filename);
-    if(filename != "")
-    {
-        simulation_filename = filename;
-    }
-    */
-}
 
 void MainWindow::loadEvolution()
 {
@@ -250,9 +110,15 @@ void MainWindow::loadEvolution()
 
 void MainWindow::loadRobot()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "", project_path);
-    if(filename == "")
-        return;
+    /*
+    QString filename = robot_config_filename;
+    if(filename == "") {
+        filename = QFileDialog::getOpenFileName(this, "Open robot", project_path, "*.txt *.json");
+        if(filename == "")
+            return;
+    }
+
+    robot_config_filename = filename;
 
     QString extension;
     {
@@ -276,13 +142,14 @@ void MainWindow::loadRobot()
         ui->robotConfigTree->clear();
         robot_part_hash.clear();
 
+        if(root_part) delete root_part;
         root_part = new RobotPart;
         root_part->type = PART_TYPE::CORE_COMPONENT;
 
         in.readLine();
         RobotPart* current_parent = root_part;
-        RobotPart *new_part;
-        RobotPart *prev_part;
+        RobotPart *new_part = nullptr;
+        RobotPart *prev_part = nullptr;
         int tabs = 1;
 
         while(in.readLineInto(&line) && !line.isEmpty())
@@ -348,10 +215,12 @@ void MainWindow::loadRobot()
     {
         qDebug() << "FAILED TO OPEN ROBOT FILE: " << filename <<endl;
     }
+    */
 }
 
 void MainWindow::loadRobotJson(QString filename)
 {
+    /*
     qDebug() << "Opening robot json config: " << filename << " ... ";
     QFile file(filename);
     if(!file.open(QIODevice::ReadOnly)) {
@@ -399,15 +268,17 @@ void MainWindow::loadRobotJson(QString filename)
     ui->robotConfigTree->clear();
     ui->robotConfigTree->addTopLevelItem(root_part);
     ui->robotConfigTree->expandAll();
+    */
 }
 
 void MainWindow::onLoadConfig()
 {
-    loadConfig();
+    //loadConfig();
 }
 
 void MainWindow::loadConfig(QString default_path)
 {
+    /*
     QString filename;
     if(default_path != "")
     {
@@ -449,11 +320,68 @@ void MainWindow::loadConfig(QString default_path)
         {
             project_path = object["config-path"].toString();
         }
+
+        if(object["simulation-config-file"].toString() != "") {
+            simulation_config_filename = object["simulation-config-file"].toString();
+            loadSimulation();
+        }
+
+        if(object["robot-config-file"].toString() != "") {
+            robot_config_filename = object["robot-config-file"].toString();
+            loadRobot();
+        }
     }
+    */
+}
+
+void MainWindow::saveConfig()
+{
+    /*
+    QString filename = config_filename;
+    if(filename == "")
+            return;
+
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
+        QMessageBox::critical(this, "Error", "Could not open " + filename + " for saving");
+        return;
+    }
+
+    QJsonDocument doc = QJsonDocument();
+    QJsonObject object;
+    object["build-path"] = ui->edit_robogenpath->text();
+    object["output-path"] = ui->line_evolve->text();
+    //object["config-path"] = ui->edit_robogenpath->text();
+    object["simulation-config-file"] = simulation_config_filename;
+    object["evolution-config-file"] = evolution_config_filename;
+    object["robot-config-file"] = robot_config_filename;
+
+    doc.setObject(object);
+    file.write(doc.toJson());
+*/
+}
+
+void MainWindow::onSaveConfig()
+{
+    /*
+    if(config_filename == "")
+        onSaveConfigAs();
+    else
+        saveConfig();
+        */
+}
+
+void MainWindow::onSaveConfigAs()
+{
+    /*
+    config_filename = QFileDialog::getSaveFileName(this, "Save File", config_filename, "*.json");
+    saveConfig();
+    */
 }
 
 void MainWindow::saveSimulation()
 {
+    /*
     QString filename = project_path + "/sim.txt";
 
     QFile file(filename);
@@ -475,17 +403,63 @@ void MainWindow::saveSimulation()
         stream <<"sensorNoiseLevel="<< ui->spin_sensornoiselevel->value() << endl;
         stream <<"motorNoiseLevel="<< ui->spin_motornoiselevel->value() << endl;
         stream <<"capAcceleration="<< (ui->check_capacceleration->isChecked() ? "true": "false") << endl;
-        stream <<"obstaclesConfigFile="<< project_path+"simpleArena.txt" << endl;
+        if(ui->line_obstacles->text().length() > 0) {
+            stream <<"obstaclesConfigFile="<< ui->line_obstacles->text() << endl;
+        }
     }
     else
     {
         qDebug() << "FAILED TO SAVE SIMULATION TO: " << filename << endl;
+        QMessageBox::critical(this, "Error", "Failed to save simulation config to: " + filename);
+    }
+    */
+}
+
+void MainWindow::loadSimulation()
+{
+    /*
+    QString filename = "";
+    if(simulation_config_filename == "") {
+        filename = QFileDialog::getOpenFileName(this, "", project_path);
+        if(filename == "")
+            return;
+
+        simulation_config_filename = filename;
+    } else {
+        filename = simulation_config_filename;
     }
 
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Error", "Could not open simulation config file: " + filename);
+        simulation_config_filename = "";
+        return;
+    }
+
+    QTextStream stream(&file);
+    while(!stream.atEnd()) {
+        QString line = stream.readLine();
+        // Separate key/value with =
+        QStringList tok = line.split("=");
+        if(tok[0] == "scenario") ui->combo_scenario->setCurrentText(tok[1]);
+        else if(tok[0] == "timeStep") ui->spin_timestep->setValue(tok[1].toDouble());
+        else if(tok[0] == "actuationFrequency") ui->spin_actuationfrequency->setValue(tok[1].toDouble());
+        else if(tok[0] == "nTimeSteps") ui->spin_ntimesteps->setValue(tok[1].toInt());
+        else if(tok[0] == "terrainType") ui->combo_terraintype->setCurrentText(tok[1]);
+        else if(tok[0] == "terrainLength") ui->spin_terrainlength->setValue(tok[1].toDouble());
+        else if(tok[0] == "terrainFriction") ui->spin_terrainfriction->setValue(tok[1].toDouble());
+        else if(tok[0] == "sensorNoiseLevel") ui->spin_sensornoiselevel->setValue(tok[1].toDouble());
+        else if(tok[0] == "motorNoiseLevel") ui->spin_motornoiselevel->setValue(tok[1].toDouble());
+        else if(tok[0] == "capAcceleration") ui->check_capacceleration->setChecked(tok[1]=="true"? true : false);
+        else if(tok[0] == "obstaclesConfigFile") ui->line_obstacles->setText(tok[1]);
+    }
+    */
 }
+
 
 void MainWindow::saveEvolution()
 {
+    /*
     QString filename = project_path + "/evo.txt";
 
     QFile file(filename);
@@ -518,6 +492,7 @@ void MainWindow::saveEvolution()
         if(ui->combo_evolutionmode->currentText() == "full" && ui->combo_evolutionaryalgorithm->currentText() == "HyperNEAT") {
             stream <<"evolutionaryAlgorithm=" << "Basic" << endl;    // Basic, HyperNEAT
             qDebug() << "WARNING: HyperNEAT cannot be used with full evolutions, setting to Basic" << endl;
+            QMessageBox::warning(this, "Warning", "HyperNEAT canno be used with full evolutions, using Basic");
         }
         else {
             stream <<"evolutionaryAlgorithm=" << ui->combo_evolutionaryalgorithm->currentText() << endl;    // Basic, HyperNEAT
@@ -532,10 +507,12 @@ void MainWindow::saveEvolution()
     {
         qDebug() << "FAILED TO SAVE EVOLUTION TO: " << filename << endl;
     }
+    */
 }
 
 void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
 {
+    /*
     QString type;
     QString name;
     switch(part->type)
@@ -595,10 +572,12 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     {
         writeRobotPart(dynamic_cast<RobotPart*>(part->child(i)), tab+1,stream);
     }
+    */
 }
 
 void MainWindow::saveRobot()
 {
+    /*
     QString filename = project_path + "/robot.txt";
 
     QFile file(filename);
@@ -614,10 +593,12 @@ void MainWindow::saveRobot()
     {
         qDebug() << "FAILED TO SAVE ROBOT TO: " << filename << endl;
     }
+    */
 }
 
 void MainWindow::saveAll()
 {
+    /*
     if(project_path.isEmpty())
     {
         QString path = QFileDialog::getExistingDirectory(this);
@@ -630,30 +611,38 @@ void MainWindow::saveAll()
         saveEvolution();
         saveSimulation();
     }
+    */
 }
 
 void MainWindow::browseRobogen()
 {
+    /*
     QString path = QFileDialog::getExistingDirectory(this);
 
     ui->edit_robogenpath->setText(path);
+    */
 }
 
 void MainWindow::browseEvolve()
 {
+    /*
     QString path = QFileDialog::getExistingDirectory(this);
 
     ui->line_evolve->setText(path);
+    */
 }
 
 void MainWindow::browseCustomScenario()
 {
+    /*
     QString filename = QFileDialog::getOpenFileName(this);
     ui->line_scenario->setText(filename);
+    */
 }
 
 void MainWindow::onPushEvolve()
 {   
+    /*
     if(fs_watcher)
         delete fs_watcher;
 
@@ -737,18 +726,20 @@ void MainWindow::onPushEvolve()
     }
 
     // Create file system watcher so we can check for new generations
-    /*{
-        fs_watcher = new QFileSystemWatcher;
-        fs_watcher->addPath(ui->line_evolve->text() + "/../");
-        connect(fs_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onFileChanged(QString)));
-        qDebug() << "watching " << fs_watcher->directories() << endl;
-    }*/
+    //{
+    //    fs_watcher = new QFileSystemWatcher;
+    //    fs_watcher->addPath(ui->line_evolve->text() + "/../");
+    //    connect(fs_watcher, SIGNAL(directoryChanged(QString)), this, SLOT(onFileChanged(QString)));
+    //    qDebug() << "watching " << fs_watcher->directories() << endl;
+   // }
 
     dir_watcher.watch(ui->line_evolve->text(),500);
+    */
 }
 
 void MainWindow::onPushSimulate()
 {
+    /*
     QString program = ui->edit_robogenpath->text() + "/robogen-file-viewer";
     QStringList arguments;
     QListWidgetItem *current = ui->list_generationsbest->currentItem();
@@ -760,10 +751,12 @@ void MainWindow::onPushSimulate()
         process_simulate->setWorkingDirectory(ui->edit_robogenpath->text());
         process_simulate->start(program, arguments);
     }
+    */
 }
 
 void MainWindow::onPushAnalyze()
 {
+    /*
     QString path = ui->line_evolve->text() + "/BestAvgStd.txt";
     QFile file(path);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -852,10 +845,12 @@ void MainWindow::onPushAnalyze()
     customPlot->show();
 
     qDebug() << "PLOTTING" << v_best.length();
+    */
 }
 
 void MainWindow::onPushStop()
 {
+    /*
     qDebug() << "Killing all servers ..." << endl;
     for(QProcess* p: process_list)
     {
@@ -863,28 +858,34 @@ void MainWindow::onPushStop()
     }
 
     process_list.clear();
+    */
 }
 
 void MainWindow::onFileChanged(QString filename)
 {
+    /*
     ui->list_generationsbest->addItem(filename);
     if(filename.startsWith("Generation"))
     {
         ui->list_generationsbest->addItem(filename);
     }
+    */
 }
 
 void MainWindow::onNewFileList(QStringList files)
 {
+    /*
    // qDebug() << files << endl;
     auto index = ui->list_generationsbest->currentIndex();
     ui->list_generationsbest->clear();
     ui->list_generationsbest->addItems(files);
     ui->list_generationsbest->setCurrentIndex(index);
+    */
 }
 
 void MainWindow::evolveReadReady()
 {
+    /*
     QByteArray data = process_evolve->readLine();
     QString line(data);
     qDebug() << line;
@@ -897,51 +898,240 @@ void MainWindow::evolveReadReady()
             ui->list_generationsbest->addItem(QString("GenerationBest-") + QString::number(n_generation/2) + ".json");
         }
     }
+    */
 }
 
 void MainWindow::onEvolveFinished(int)
 {
-    ui->push_evolve->setEnabled(true);
+    // ui->push_evolve->setEnabled(true);
 }
 
-PART_TYPE MainWindow::typeFromString(QString str)
+void MainWindow::onFileEvent(const QString& str)
 {
-    PART_TYPE type = PART_TYPE::PASSIVE_HINGE;
 
-    if(str == "FixedBrick")
-        type = PART_TYPE::FIXED_BRICK;
+}
 
-    else if(str == "ActiveHinge")
-        type = PART_TYPE::ACTIVE_HINGE;
+void MainWindow::onNewProject()
+{
+    ui->tree_project->clear();
+    onProjectTreeAdd();
+    simulation_config_form->current_config = nullptr;
+    simulation_config_form->hide();
 
-    else if(str == "PassiveHinge")
-        type = PART_TYPE::PASSIVE_HINGE;
+    evolution_config_form->current_config = nullptr;
+    evolution_config_form->hide();
 
-    else if(str == "IrSensor")
-        type = PART_TYPE::IR_SENSOR;
+    robot_config_form->hide();
+    overview_form->show();
+    overview_form->current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
+    overview_form->loadAll();
 
-    else if(str == "LightSensor")
-        type = PART_TYPE::LIGHT_SENSOR;
+    ui->tree_project->setCurrentItem(ui->tree_project->topLevelItem(0));
+}
 
-    else if(str == "ParametricJoint")
-        type = PART_TYPE::PARAMETRIC_JOINT;
+void MainWindow::onOpenProject()
+{
+    //TODO Check if this project is saved?
+    project_directory = QFileDialog::getExistingDirectory(this, "Choose project directory to open", "");
+    if(project_directory == "")
+        return;
 
-    else if(str == "CoreComponent")
-        type = PART_TYPE::CORE_COMPONENT;
-
-    else if(str == "ActiveWheel")
-        type = PART_TYPE::ACTIVE_WHEEL;
-
-    else if(str == "PassiveWheel")
-        type = PART_TYPE::PASSIVE_WHEEL;
-    else {
-        qDebug() << "ERROR: Part type '" << str << "' is  unupported";
+    QFile project_file(project_directory + "/project.json");
+    if(!project_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Saving Error", "Could not open " + project_directory + " for reading\nProject open failed");
+        return;
     }
 
-    return type;
+    ui->tree_project->clear();
+
+    QJsonDocument doc = QJsonDocument::fromJson(project_file.readAll());
+    QJsonObject main_object = doc.object();
+    settings_window->set_robogen_directory(main_object["robogen_directory"].toString());
+
+    QJsonArray configs = main_object["configurations"].toArray();
+    for(int i = 0; i < configs.size(); i++) {
+        QJsonObject config = configs[i].toObject();
+        ProjectConfiguration* project1_config = new ProjectConfiguration();
+        project1_config->setText(0, config["name"].toString());
+        ui->tree_project->addTopLevelItem(project1_config);
+
+        QJsonObject simulation_obj = config["simulation"].toObject();
+        QJsonObject evolution_obj = config["evolution"].toObject();
+
+        for(const QString& key: simulation_obj.keys()) {
+            if(key.startsWith("combo")) {
+                project1_config->simulation->combo_map[key] = simulation_obj.value(key).toString();
+            }
+            else if(key.startsWith("spin")) {
+                project1_config->simulation->spin_map[key] = simulation_obj.value(key).toInt();
+            }
+            else if(key.startsWith("dspin")) {
+                project1_config->simulation->double_spin_map[key] = simulation_obj.value(key).toDouble();
+            }
+        }
+
+        for(const QString& key: evolution_obj.keys()) {
+            if(key.startsWith("combo")) {
+                project1_config->evolution->combo_map[key] = evolution_obj.value(key).toString();
+            }
+            else if(key.startsWith("spin")) {
+                project1_config->evolution->spin_map[key] = evolution_obj.value(key).toInt();
+            }
+            else if(key.startsWith("dspin")) {
+                project1_config->evolution->double_spin_map[key] = evolution_obj.value(key).toDouble();
+            }
+        }
+    }
+
+    simulation_config_form->current_config = nullptr;
+    simulation_config_form->hide();
+
+    evolution_config_form->current_config = nullptr;
+    evolution_config_form->hide();
+
+    robot_config_form->hide();
+    overview_form->show();
+    overview_form->current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
+    overview_form->loadAll();
+
+    ui->tree_project->setCurrentItem(ui->tree_project->topLevelItem(0));
+}
+
+void MainWindow::onSaveProject()
+{
+    if(project_directory == "") {
+        project_directory = QFileDialog::getExistingDirectory(this, "Choose project directory", "");
+        if(project_directory == "")
+            return;
+    }
+
+    QFile project_file(project_directory + "/project.json");
+    if(!project_file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
+        QMessageBox::critical(this, "Saving Error", "Could not open " + project_directory + " for writing\nProject save failed");
+        return;
+    }
+
+    if(!simulation_config_form->isHidden()) simulation_config_form->saveAll();
+    if(!evolution_config_form->isHidden()) evolution_config_form->saveAll();
+
+    QJsonDocument doc;
+    QJsonObject main_object;
+
+    main_object["robogen_directory"] = settings_window->get_robogen_directory();
+
+    QJsonArray config_array;
+    for(int i = 0; i < ui->tree_project->topLevelItemCount(); i++) {
+        ProjectConfiguration* config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(i));
+        QJsonObject config_obj;
+        QJsonObject evolution_obj;
+        for(auto& pair: config->evolution->combo_map) {
+            evolution_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->evolution->spin_map) {
+            evolution_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->evolution->double_spin_map) {
+            evolution_obj[pair.first] = pair.second;
+        }
+        config_obj["evolution"] = evolution_obj;
+
+        QJsonObject simulation_obj;
+        for(auto& pair: config->simulation->combo_map) {
+            simulation_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->simulation->spin_map) {
+            simulation_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->simulation->double_spin_map) {
+            simulation_obj[pair.first] = pair.second;
+        }
+        config_obj["simulation"] = simulation_obj;
+        config_obj["name"] = config->text(0);
+        config_array.push_back(config_obj);
+    }
+
+    main_object["configurations"] = config_array;
+
+    doc.setObject(main_object);
+
+    project_file.write(doc.toJson());
+
+    //TODO Save robot configuration
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
+{
+    //if(!robot_config_form->isHidden()) robot_config_form->saveAll();
+    if(!simulation_config_form->isHidden()) simulation_config_form->saveAll();
+    if(!evolution_config_form->isHidden()) evolution_config_form->saveAll();
+    ConfigurationItem* item = dynamic_cast<ConfigurationItem*>(item_);
+    //qDebug() << "select: " << (int)item->getType();
+
+
+    robot_config_form->hide();
+    simulation_config_form->hide();
+    evolution_config_form->hide();
+    overview_form->hide();
+
+    switch (item->getType()) {
+    case ItemClass::EVOLUTION:
+        evolution_config_form->show();
+        evolution_config_form->current_config = dynamic_cast<EvolutionConfiguration*>(item);
+        evolution_config_form->loadAll();
+        break;
+    case ItemClass::ROBOT:
+        robot_config_form->show();
+        break;
+    case ItemClass::SIMULATION:
+        simulation_config_form->show();
+        simulation_config_form->current_config = dynamic_cast<SimulationConfiguration*>(item);
+        simulation_config_form->loadAll();
+        break;
+    case ItemClass::PROJECT:
+        overview_form->show();
+        overview_form->current_config = dynamic_cast<ProjectConfiguration*>(item);
+        overview_form->loadAll();
+        break;
+    default:
+        break;
+    }
+
+}
+
+void MainWindow::onProjectTreeAdd()
+{
+    ProjectConfiguration* project1_config = new ProjectConfiguration();
+
+    project1_config->setText(0, "Configuration 1");
+    ui->tree_project->addTopLevelItem(project1_config);
+
+    EvolutionConfiguration* evo_config = evolution_config_form->current_config;
+    evolution_config_form->current_config = project1_config->evolution;
+    evolution_config_form->saveAll();
+    evolution_config_form->current_config = evo_config;
+
+    SimulationConfiguration* sim_config = simulation_config_form->current_config;
+    simulation_config_form->current_config = project1_config->simulation;
+    simulation_config_form->saveAll();
+    simulation_config_form->current_config = sim_config;
+}
+
+void MainWindow::onProjectTreeRemove()
+{
+    if(ui->tree_project->topLevelItemCount() < 2)
+        return;
+    ConfigurationItem* item = dynamic_cast<ConfigurationItem*>(ui->tree_project->currentItem());
+    if(item != nullptr && item->getType() == ItemClass::PROJECT) {
+        delete item;
+    }
+}
+

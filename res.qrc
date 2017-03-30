@@ -7,5 +7,7 @@
         <file alias="ParametricJoint">images/180px-Joint.png</file>
         <file alias="LightSensor">images/LightSensor_External_smaller-length_bigger-diameter-300x169.png</file>
         <file alias="IrSensor">images/IRsensor-300x154.jpg</file>
+        <file alias="plus">images/plus.png</file>
+        <file alias="minus">images/minus.png</file>
     </qresource>
 </RCC>
