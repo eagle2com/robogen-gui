@@ -22,6 +22,10 @@ ItemClass RobotConfiguration::getType() {
 RobotConfiguration::RobotConfiguration(QObject *parent)
 {
     setText(0, "Robot");
+    root_part = new RobotPart();
+    root_part->type = PART_TYPE::CORE_COMPONENT;
+    root_part->name = "ROOT";
+
 }
 
 ItemClass SimulationConfiguration::getType() {

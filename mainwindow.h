@@ -38,25 +38,10 @@ public slots:
 
     void loadSimulation();
     void loadEvolution();
-    void loadRobot();
-    void loadRobotJson(QString filename);
-
-    void onLoadConfig();
-    void loadConfig(QString default_path = "");
-
-    void saveConfig();
-    void onSaveConfig();
-    void onSaveConfigAs();
 
     void saveSimulation();
     void saveEvolution();
     void saveRobot();
-
-    void saveAll();
-
-    void browseRobogen();
-    void browseEvolve();
-    void browseCustomScenario();
 
     void onPushEvolve();
     void onPushSimulate();

@@ -1,22 +1,17 @@
 #include "robotconfigform.h"
 #include "ui_robotconfigform.h"
 #include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 RobotConfigForm::RobotConfigForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RobotConfigForm)
 {
     ui->setupUi(this);
-
-    RobotPart *part = new RobotPart;
-    part->name = "ROOT";
-    part->type = PART_TYPE::CORE_COMPONENT;
-    part->face = PART_FACE::FRONT;
-    part->update();
-
-    root_part = part;
-
-    ui->robotConfigTree->addTopLevelItem(part);
 
     ui->robotConfigTree->expandAll();
 
@@ -42,10 +37,10 @@ RobotConfigForm::RobotConfigForm(QWidget *parent) :
     ui->robotPartCombo->setItemIcon(6, QIcon(":/imgs/IrSensor"));
 
     ui->robotPartCombo->addItem("Active Wheel");
-    ui->robotPartCombo->setItemIcon(7, QIcon(":/imgs/ActiveHinge"));
+    ui->robotPartCombo->setItemIcon(7, QIcon(":/imgs/ActiveWheel"));
 
     ui->robotPartCombo->addItem("Passive Wheel");
-    ui->robotPartCombo->setItemIcon(8, QIcon(":/imgs/PassiveHinge"));
+    ui->robotPartCombo->setItemIcon(8, QIcon(":/imgs/PassiveWheel"));
 
     //FIXME move this
     //ui->spin_threads->setMinimum(1);
@@ -61,11 +56,13 @@ RobotConfigForm::RobotConfigForm(QWidget *parent) :
     connect(ui->button_remove_part, SIGNAL(clicked(bool)), this, SLOT(onRemovePart()));
     connect(ui->robotConfigTree, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onItemChange(QTreeWidgetItem*,QTreeWidgetItem*)));
     connect(ui->robotPartNameEdit, SIGNAL(textEdited(QString)), this, SLOT(onRobotPartNameChange(QString)));
+
+    connect(ui->push_load, SIGNAL(clicked()), this, SLOT(onLoadRobot()));
 }
 
 void RobotConfigForm::onItemChange(QTreeWidgetItem*, QTreeWidgetItem*)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -91,10 +88,289 @@ void RobotConfigForm::onItemChange(QTreeWidgetItem*, QTreeWidgetItem*)
     ui->spin_paramrotation->blockSignals(false);
 }
 
+void RobotConfigForm::onLoadRobot()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose robot config file", "", "*.json *.txt");
+    //qDebug() << filename;
+
+    QString extension;
+    {
+        QStringList tokens = filename.split('.');
+        extension = tokens.back();
+    }
+
+    if(extension == "json")
+    {
+        loadRobotJson(filename);
+        return;
+    }
+
+    QFile file(filename);
+
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&file);
+        QString line;
+
+        //ui->robotConfigTree->clear();
+        current_config->robot_part_hash.clear();
+
+        if(current_config->root_part) delete current_config->root_part;
+        current_config->root_part = new RobotPart();
+        current_config->root_part->type = PART_TYPE::CORE_COMPONENT;
+
+        in.readLine();
+        RobotPart* current_parent = current_config->root_part;
+        RobotPart *new_part = nullptr;
+        RobotPart *prev_part = nullptr;
+        int tabs = 1;
+
+        while(in.readLineInto(&line) && !line.isEmpty())
+        {
+            QStringList tokens = line.split(QRegularExpression("[ \t]"));
+            int ctabs = 0;
+            //qDebug() << tokens;
+            while(tokens.front().isEmpty())
+            {
+                ctabs++;
+                tokens.pop_front();
+            }
+
+            new_part = new RobotPart;
+
+            new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
+            QString type = tokens.front(); tokens.pop_front();
+
+            new_part->type = typeFromString(type);
+            new_part->name = tokens.front(); tokens.pop_front();
+            new_part->rotation = tokens.front().toInt(); tokens.pop_front();
+
+            if(new_part->type == PART_TYPE::PARAMETRIC_JOINT)
+            {
+                new_part->param_length = tokens.front().toDouble(); tokens.pop_front();
+                new_part->param_rotation = tokens.front().toDouble(); tokens.pop_front();
+                // We leave the last 0 to rot because we dont need it
+            }
+
+            if(ctabs == tabs)
+            {
+                current_parent->addChild(new_part);
+            }
+            else if(ctabs > tabs)
+            {
+                tabs = ctabs;
+                prev_part->addChild(new_part);
+                current_parent = prev_part;
+            }
+            else
+            {
+                while(ctabs < tabs)
+                {
+                    current_parent = (RobotPart*)current_parent->parent();
+                    tabs--;
+                }
+
+                tabs = ctabs;
+                current_parent->addChild(new_part);
+            }
+
+            new_part->update();
+            current_config->robot_part_hash.insert(new_part->name, new_part);
+            current_config->root_part->update();
+
+            prev_part = new_part;
+        }
+
+        ui->robotConfigTree->addTopLevelItem(current_config->root_part);
+        ui->robotConfigTree->expandAll();
+    }
+    else
+    {
+        qDebug() << "FAILED TO OPEN ROBOT FILE: " << filename <<endl;
+    }
+}
+
+void RobotConfigForm::loadRobotJson(const QString &filename)
+{
+    //qDebug() << "Opening robot json config: " << filename << " ... ";
+    QFile file(filename);
+    if(!file.open(QIODevice::ReadOnly)) {
+        //qDebug() << "[FAIL]" << endl;
+        QMessageBox::critical(this, "Error", "Could not open " + filename + " for reading.");
+        return;
+    }
+    //qDebug() << "[ OK ]";
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    QJsonObject object = doc.object();
+
+    QJsonArray parts = object["body"].toObject()["part"].toArray();
+
+    //qDebug() << "Found " << parts.size() << " parts";
+
+    QHash<QString, RobotPart*> hash;
+
+    RobotPart *new_root_part = new RobotPart;
+    foreach (const QJsonValue & part, parts)
+    {
+        RobotPart *new_part = new RobotPart;
+        new_part->name = part.toObject()["id"].toString();
+        new_part->type = typeFromString(part.toObject()["type"].toString());
+        //qDebug() << "type string: " << part.toObject()["type"].toString();
+        new_part->rotation = part.toObject()["orientation"].toInt();
+        if(new_part->type == PART_TYPE::CORE_COMPONENT)
+            new_root_part = new_part;
+
+        //qDebug() << "part: NAME='" << new_part->name << "' type='" << (int)new_part->type << "' rotation='" << new_part->rotation;
+        hash.insert(new_part->name, new_part);
+    }
+
+    QJsonArray connections = object["body"].toObject()["connection"].toArray();
+    foreach (const QJsonValue & connection, connections)
+    {
+        RobotPart *parent = hash[connection.toObject()["src"].toString()];
+        RobotPart *child = hash[connection.toObject()["dest"].toString()];
+        child->face = (PART_FACE)connection.toObject()["srcSlot"].toInt();
+        parent->addChild(child);
+        child->update();
+    }
+    //qDebug() << "Root part:" << new_root_part->name << endl;
+    current_config->root_part = new_root_part;
+    current_config->root_part->update();
+    ui->robotConfigTree->clear();
+    ui->robotConfigTree->addTopLevelItem(current_config->root_part);
+    ui->robotConfigTree->expandAll();
+}
+
+void RobotConfigForm::loadAll()
+{
+    //ui->robotConfigTree->clear();
+    ui->robotConfigTree->removeItemWidget(ui->robotConfigTree->topLevelItem(0), 0);
+    ui->robotConfigTree->addTopLevelItem(current_config->root_part);
+}
+
+void RobotConfigForm::saveAll()
+{
+
+}
+
+QJsonObject RobotConfigForm::getPartJsonObject(RobotPart* part)
+{
+    /*QJsonObject obj;
+    QString type;
+    QString name;
+    switch(part->type)
+    {
+    case PART_TYPE::CORE_COMPONENT:
+        type = "CoreComponent";
+        break;
+    case PART_TYPE::FIXED_BRICK:
+        type = "FixedBrick";
+        break;
+    case PART_TYPE::ACTIVE_HINGE:
+        type = "ActiveHinge";
+        break;
+    case PART_TYPE::PASSIVE_HINGE:
+        type = "PassiveHinge";
+        break;
+    case PART_TYPE::PARAMETRIC_JOINT:
+        type = "ParametricJoint";
+        break;
+    case PART_TYPE::LIGHT_SENSOR:
+        type = "LightSensor";
+        break;
+    case PART_TYPE::IR_SENSOR:
+        type = "IrSensor";
+        break;
+    case PART_TYPE::ACTIVE_WHEEL:
+        type = "ActiveWheel";
+        break;
+    case PART_TYPE::PASSIVE_WHEEL:
+        type = "PassiveWheel";
+        break;
+    }
+
+
+    name = part->name;
+    if(name.isEmpty())
+        name = "PARTGEN_" + QString::number((ulong)part);
+
+
+    obj["id"] = name;
+    obj["type"] =
+
+    if(part->type == PART_TYPE::PARAMETRIC_JOINT)
+    {
+        // The last param is the inclination, which is disabled for now and force to 0
+        stream << " " << part->param_length << " " << part->param_rotation <<" 0";
+    }
+    //FIXME Dirty hack
+    if(part->type == PART_TYPE::ACTIVE_WHEEL || part->type == PART_TYPE::PASSIVE_WHEEL)
+    {
+        // radius?
+        stream << " " << 0.04;
+    }
+    stream << endl;
+
+    for(int i = 0; i < part->childCount(); i++)
+    {
+        writeRobotPart(dynamic_cast<RobotPart*>(part->child(i)), tab+1,stream);
+    }
+
+    return obj;*/
+}
+
+QJsonObject RobotConfigForm::getRobotJsonObject()
+{
+    QJsonObject obj;
+
+    QJsonObject body_obj;
+
+    // Array of parts
+    QJsonArray part_array;
+
+    // Array of connections
+    QJsonArray conn_array;
+
+    QTreeWidgetItemIterator it(ui->robotConfigTree);
+    while(*it) {
+        RobotPart* part = dynamic_cast<RobotPart*>(*it);
+        QJsonObject part_obj;
+
+        part_obj["id"] = part->name;
+        part_obj["type"] = stringFromType(part->type);
+        part_obj["root"] = part->parent() == nullptr? true:false;
+        part_obj["orientation"] = part->rotation;
+
+        if(part->parent() != nullptr) {
+            QJsonObject conn_obj;
+            conn_obj["src"] = dynamic_cast<RobotPart*>(part->parent())->name;
+            conn_obj["dest"] = part->name;
+            conn_obj["srcSlot"] = (int)part->face;
+            conn_obj["destSlot"] = 0;
+            conn_array.push_back(conn_obj);
+        }
+
+        part_array.push_back(part_obj);
+        ++it;
+    }
+    body_obj["part"] = part_array;
+    body_obj["connection"] = conn_array;
+
+    obj["body"] = body_obj;
+
+    return obj;
+}
+
 void RobotConfigForm::onAddPart()
 {
+    if(!current_config)
+        return;
     RobotPart *part = new RobotPart;
-    root_part->addChild(part);
+    current_config->root_part->addChild(part);
     ui->robotConfigTree->clearSelection();
     ui->robotConfigTree->setCurrentItem(part);
 }
@@ -102,11 +378,11 @@ void RobotConfigForm::onAddPart()
 void RobotConfigForm::onRemovePart()
 {
     QTreeWidgetItem* item = ui->robotConfigTree->currentItem();
-    printf("item: %p\n", item);
+    //printf("item: %p\n", item);
     if(!item)
         return;
 
-    if(item == root_part)
+    if(item == current_config->root_part)
         return;
 
     if(!item->parent())
@@ -131,7 +407,7 @@ void RobotConfigForm::onRobotPartChange(int index)
 
 void RobotConfigForm::onRobotFaceChange(int index)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -141,7 +417,7 @@ void RobotConfigForm::onRobotFaceChange(int index)
 
 void RobotConfigForm::onRobotPartNameChange(QString name)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -151,7 +427,7 @@ void RobotConfigForm::onRobotPartNameChange(QString name)
 
 void RobotConfigForm::onRobotRotationChange(int index)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -161,7 +437,7 @@ void RobotConfigForm::onRobotRotationChange(int index)
 
 void RobotConfigForm::onRobotParamLengthChange(double value)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -173,7 +449,7 @@ void RobotConfigForm::onRobotParamLengthChange(double value)
 
 void RobotConfigForm::onRobotParamRotationChange(int value)
 {
-    RobotPart* part = (RobotPart*)ui->robotConfigTree->currentItem();
+    RobotPart* part = dynamic_cast<RobotPart*>(ui->robotConfigTree->currentItem());
     if(!part)
         return;
 
@@ -220,7 +496,42 @@ PART_TYPE RobotConfigForm::typeFromString(QString str)
     }
 
     return type;
+}
 
+QString RobotConfigForm::stringFromType(PART_TYPE tp)
+{
+    QString type;
+    switch(tp)
+    {
+    case PART_TYPE::CORE_COMPONENT:
+        type = "CoreComponent";
+        break;
+    case PART_TYPE::FIXED_BRICK:
+        type = "FixedBrick";
+        break;
+    case PART_TYPE::ACTIVE_HINGE:
+        type = "ActiveHinge";
+        break;
+    case PART_TYPE::PASSIVE_HINGE:
+        type = "PassiveHinge";
+        break;
+    case PART_TYPE::PARAMETRIC_JOINT:
+        type = "ParametricJoint";
+        break;
+    case PART_TYPE::LIGHT_SENSOR:
+        type = "LightSensor";
+        break;
+    case PART_TYPE::IR_SENSOR:
+        type = "IrSensor";
+        break;
+    case PART_TYPE::ACTIVE_WHEEL:
+        type = "ActiveWheel";
+        break;
+    case PART_TYPE::PASSIVE_WHEEL:
+        type = "PassiveWheel";
+        break;
+    }
+    return type;
 }
 
 RobotConfigForm::~RobotConfigForm()

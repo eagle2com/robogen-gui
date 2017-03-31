@@ -9,5 +9,7 @@
         <file alias="IrSensor">images/IRsensor-300x154.jpg</file>
         <file alias="plus">images/plus.png</file>
         <file alias="minus">images/minus.png</file>
+        <file alias="ActiveWheel">images/180px-Awheel.png</file>
+        <file alias="PassiveWheel">images/180px-Pwheel.png</file>
     </qresource>
 </RCC>

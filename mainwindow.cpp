@@ -56,8 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /*
 
-    connect(ui->robotConfigTree, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(onItemChange(QTreeWidgetItem*,QTreeWidgetItem*)));
-
     connect(ui->action_loadsimulation, SIGNAL(triggered(bool)), this, SLOT(loadSimulation()));
     connect(ui->action_loadevolution, SIGNAL(triggered(bool)), this, SLOT(loadEvolution()));
     connect(ui->action_loadrobot, SIGNAL(triggered(bool)), this, SLOT(loadRobot()));
@@ -68,17 +66,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->action_saveall, SIGNAL(clicked(bool)), this, SLOT(saveAll()));
 
-    connect(ui->push_robogenbrowse, SIGNAL(clicked(bool)), this, SLOT(browseRobogen()));
-    connect(ui->push_browseevolve, SIGNAL(clicked(bool)), this, SLOT(browseEvolve()));
-    connect(ui->push_browsescenario, SIGNAL(clicked(bool)), this, SLOT(browseCustomScenario()));
-
     connect(ui->push_evolve, SIGNAL(clicked(bool)), this, SLOT(onPushEvolve()));
     connect(ui->push_simulate, SIGNAL(clicked(bool)), this, SLOT(onPushSimulate()));
     connect(ui->push_analyze, SIGNAL(clicked(bool)), this, SLOT(onPushAnalyze()));
-
-    connect(ui->action_loadconfig, SIGNAL(triggered(bool)), this, SLOT(onLoadConfig()));
-    connect(ui->action_saveconfig, SIGNAL(triggered(bool)), this, SLOT(onSaveConfig()));
-    connect(ui->action_saveconfig_as, SIGNAL(triggered(bool)), this, SLOT(onSaveConfigAs()));
 
     connect(ui->push_stop, SIGNAL(clicked(bool)), this, SLOT(onPushStop()));
 
@@ -105,277 +95,6 @@ void MainWindow::loadEvolution()
     {
         evolution_filename = filename;
     }
-    */
-}
-
-void MainWindow::loadRobot()
-{
-    /*
-    QString filename = robot_config_filename;
-    if(filename == "") {
-        filename = QFileDialog::getOpenFileName(this, "Open robot", project_path, "*.txt *.json");
-        if(filename == "")
-            return;
-    }
-
-    robot_config_filename = filename;
-
-    QString extension;
-    {
-        QStringList tokens = filename.split('.');
-        extension = tokens.back();
-    }
-
-    if(extension == "json")
-    {
-        loadRobotJson(filename);
-        return;
-    }
-
-    QFile file(filename);
-
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&file);
-        QString line;
-
-        ui->robotConfigTree->clear();
-        robot_part_hash.clear();
-
-        if(root_part) delete root_part;
-        root_part = new RobotPart;
-        root_part->type = PART_TYPE::CORE_COMPONENT;
-
-        in.readLine();
-        RobotPart* current_parent = root_part;
-        RobotPart *new_part = nullptr;
-        RobotPart *prev_part = nullptr;
-        int tabs = 1;
-
-        while(in.readLineInto(&line) && !line.isEmpty())
-        {
-            QStringList tokens = line.split(QRegularExpression("[ \t]"));
-            int ctabs = 0;
-            qDebug() << tokens;
-            while(tokens.front().isEmpty())
-            {
-                ctabs++;
-                tokens.pop_front();
-            }
-
-            new_part = new RobotPart;
-
-            new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
-            QString type = tokens.front(); tokens.pop_front();
-
-            new_part->type = typeFromString(type);
-            new_part->name = tokens.front(); tokens.pop_front();
-            new_part->rotation = tokens.front().toInt(); tokens.pop_front();
-
-            if(new_part->type == PART_TYPE::PARAMETRIC_JOINT)
-            {
-                new_part->param_length = tokens.front().toDouble(); tokens.pop_front();
-                new_part->param_rotation = tokens.front().toDouble(); tokens.pop_front();
-                // We leave the last 0 to rot because we dont need it
-            }
-
-            if(ctabs == tabs)
-            {
-                current_parent->addChild(new_part);
-            }
-            else if(ctabs > tabs)
-            {
-                tabs = ctabs;
-                prev_part->addChild(new_part);
-                current_parent = prev_part;
-            }
-            else
-            {
-                while(ctabs < tabs)
-                {
-                    current_parent = (RobotPart*)current_parent->parent();
-                    tabs--;
-                }
-
-                tabs = ctabs;
-                current_parent->addChild(new_part);
-            }
-
-            new_part->update();
-            robot_part_hash.insert(new_part->name, new_part);
-            root_part->update();
-
-            prev_part = new_part;
-        }
-
-        ui->robotConfigTree->addTopLevelItem(root_part);
-        ui->robotConfigTree->expandAll();
-    }
-    else
-    {
-        qDebug() << "FAILED TO OPEN ROBOT FILE: " << filename <<endl;
-    }
-    */
-}
-
-void MainWindow::loadRobotJson(QString filename)
-{
-    /*
-    qDebug() << "Opening robot json config: " << filename << " ... ";
-    QFile file(filename);
-    if(!file.open(QIODevice::ReadOnly)) {
-        qDebug() << "[FAIL]" << endl;
-        return;
-    }
-    qDebug() << "[ OK ]";
-
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    QJsonObject object = doc.object();
-
-    QJsonArray parts = object["body"].toObject()["part"].toArray();
-
-    qDebug() << "Found " << parts.size() << " parts";
-
-    QHash<QString, RobotPart*> hash;
-
-    RobotPart *new_root_part = new RobotPart;
-    foreach (const QJsonValue & part, parts)
-    {
-        RobotPart *new_part = new RobotPart;
-        new_part->name = part.toObject()["id"].toString();
-        new_part->type = typeFromString(part.toObject()["type"].toString());
-        qDebug() << "type string: " << part.toObject()["type"].toString();
-        new_part->rotation = part.toObject()["orientation"].toInt();
-        if(new_part->type == PART_TYPE::CORE_COMPONENT)
-            new_root_part = new_part;
-
-        qDebug() << "part: NAME='" << new_part->name << "' type='" << (int)new_part->type << "' rotation='" << new_part->rotation;
-        hash.insert(new_part->name, new_part);
-    }
-
-    QJsonArray connections = object["body"].toObject()["connection"].toArray();
-    foreach (const QJsonValue & connection, connections)
-    {
-        RobotPart *parent = hash[connection.toObject()["src"].toString()];
-        RobotPart *child = hash[connection.toObject()["dest"].toString()];
-        child->face = (PART_FACE)connection.toObject()["srcSlot"].toInt();
-        parent->addChild(child);
-        child->update();
-    }
-    qDebug() << "Root part:" << new_root_part->name << endl;
-    root_part = new_root_part;
-    root_part->update();
-    ui->robotConfigTree->clear();
-    ui->robotConfigTree->addTopLevelItem(root_part);
-    ui->robotConfigTree->expandAll();
-    */
-}
-
-void MainWindow::onLoadConfig()
-{
-    //loadConfig();
-}
-
-void MainWindow::loadConfig(QString default_path)
-{
-    /*
-    QString filename;
-    if(default_path != "")
-    {
-        filename = default_path;
-        //qDebug() << "Found default config.json file, loading ..." << endl;
-    }
-    else
-    {
-        filename = QFileDialog::getOpenFileName(this, "");
-    }
-
-    if(filename == "")
-            return;
-
-    QFile file(filename);
-    if(file.open(QIODevice::ReadOnly))
-    {
-        if(filename == default_path)
-        {
-            qDebug() << "Found default config.json file, loading ..." << endl;
-        }
-
-        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-        QJsonObject object = doc.object();
-        qDebug() << "build path:" << object["build-path"].toString() << endl;
-        if(object["build-path"].toString() != "")
-        {
-            ui->edit_robogenpath->setText(object["build-path"].toString());
-        }
-
-        qDebug() << "output path:" << object["output-path"].toString() << endl;
-        if(object["output-path"].toString() != "")
-        {
-            ui->line_evolve->setText(object["output-path"].toString());
-        }
-
-        qDebug() << "config path:" << object["config-path"].toString() << endl;
-        if(object["config-path"].toString() != "")
-        {
-            project_path = object["config-path"].toString();
-        }
-
-        if(object["simulation-config-file"].toString() != "") {
-            simulation_config_filename = object["simulation-config-file"].toString();
-            loadSimulation();
-        }
-
-        if(object["robot-config-file"].toString() != "") {
-            robot_config_filename = object["robot-config-file"].toString();
-            loadRobot();
-        }
-    }
-    */
-}
-
-void MainWindow::saveConfig()
-{
-    /*
-    QString filename = config_filename;
-    if(filename == "")
-            return;
-
-    QFile file(filename);
-    if(!file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-        QMessageBox::critical(this, "Error", "Could not open " + filename + " for saving");
-        return;
-    }
-
-    QJsonDocument doc = QJsonDocument();
-    QJsonObject object;
-    object["build-path"] = ui->edit_robogenpath->text();
-    object["output-path"] = ui->line_evolve->text();
-    //object["config-path"] = ui->edit_robogenpath->text();
-    object["simulation-config-file"] = simulation_config_filename;
-    object["evolution-config-file"] = evolution_config_filename;
-    object["robot-config-file"] = robot_config_filename;
-
-    doc.setObject(object);
-    file.write(doc.toJson());
-*/
-}
-
-void MainWindow::onSaveConfig()
-{
-    /*
-    if(config_filename == "")
-        onSaveConfigAs();
-    else
-        saveConfig();
-        */
-}
-
-void MainWindow::onSaveConfigAs()
-{
-    /*
-    config_filename = QFileDialog::getSaveFileName(this, "Save File", config_filename, "*.json");
-    saveConfig();
     */
 }
 
@@ -593,50 +312,6 @@ void MainWindow::saveRobot()
     {
         qDebug() << "FAILED TO SAVE ROBOT TO: " << filename << endl;
     }
-    */
-}
-
-void MainWindow::saveAll()
-{
-    /*
-    if(project_path.isEmpty())
-    {
-        QString path = QFileDialog::getExistingDirectory(this);
-        project_path = path;
-    }
-
-    if(!project_path.isEmpty())
-    {
-        saveRobot();
-        saveEvolution();
-        saveSimulation();
-    }
-    */
-}
-
-void MainWindow::browseRobogen()
-{
-    /*
-    QString path = QFileDialog::getExistingDirectory(this);
-
-    ui->edit_robogenpath->setText(path);
-    */
-}
-
-void MainWindow::browseEvolve()
-{
-    /*
-    QString path = QFileDialog::getExistingDirectory(this);
-
-    ui->line_evolve->setText(path);
-    */
-}
-
-void MainWindow::browseCustomScenario()
-{
-    /*
-    QString filename = QFileDialog::getOpenFileName(this);
-    ui->line_scenario->setText(filename);
     */
 }
 
@@ -921,7 +596,9 @@ void MainWindow::onNewProject()
     evolution_config_form->current_config = nullptr;
     evolution_config_form->hide();
 
+    robot_config_form->current_config = nullptr;
     robot_config_form->hide();
+
     overview_form->show();
     overview_form->current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
     overview_form->loadAll();
@@ -989,7 +666,9 @@ void MainWindow::onOpenProject()
     evolution_config_form->current_config = nullptr;
     evolution_config_form->hide();
 
+    robot_config_form->current_config = nullptr;
     robot_config_form->hide();
+
     overview_form->show();
     overview_form->current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
     overview_form->loadAll();
@@ -1060,6 +739,9 @@ void MainWindow::onSaveProject()
 
     project_file.write(doc.toJson());
 
+    QJsonObject robot_obj = robot_config_form->getRobotJsonObject();
+
+
     //TODO Save robot configuration
 }
 
@@ -1090,6 +772,8 @@ void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
         break;
     case ItemClass::ROBOT:
         robot_config_form->show();
+        robot_config_form->current_config = dynamic_cast<RobotConfiguration*>(item);
+        robot_config_form->loadAll();
         break;
     case ItemClass::SIMULATION:
         simulation_config_form->show();
@@ -1127,6 +811,7 @@ void MainWindow::onProjectTreeAdd()
 
 void MainWindow::onProjectTreeRemove()
 {
+    // Prevent removing the last configuration from the project
     if(ui->tree_project->topLevelItemCount() < 2)
         return;
     ConfigurationItem* item = dynamic_cast<ConfigurationItem*>(ui->tree_project->currentItem());
