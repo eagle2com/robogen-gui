@@ -248,8 +248,9 @@ void RobotConfigForm::loadRobotJson(const QString &filename)
 void RobotConfigForm::loadAll()
 {
     //ui->robotConfigTree->clear();
-    ui->robotConfigTree->removeItemWidget(ui->robotConfigTree->topLevelItem(0), 0);
+    ui->robotConfigTree->takeTopLevelItem(0);
     ui->robotConfigTree->addTopLevelItem(current_config->root_part);
+    ui->robotConfigTree->expandAll();
 }
 
 void RobotConfigForm::saveAll()
