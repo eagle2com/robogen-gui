@@ -1,0 +1,125 @@
+{
+ "id": 1,
+ "body": {
+  "part": [
+   {
+    "id": "ROOT",
+    "type": "CoreComponent",
+    "root": true,
+    "orientation": 0
+   },
+   {
+    "id": "PARTGEN_772912784",
+    "type": "ActiveHinge",
+    "root": false,
+    "orientation": 0
+   }
+  ],
+  "connection": [
+   {
+    "src": "ROOT",
+    "dest": "PARTGEN_772912784",
+    "srcSlot": 0,
+    "destSlot": 0
+   }
+  ]
+ },
+ "brain": {
+  "neuron": [
+   {
+    "id": "PARTGEN_772912784-0",
+    "layer": "output",
+    "type": "sigmoid",
+    "bias": 0.23126690089702606,
+    "bodyPartId": "PARTGEN_772912784",
+    "ioId": 0,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-0",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 0,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-1",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 1,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-2",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 2,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-3",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 3,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-4",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 4,
+    "gain": 1.0
+   },
+   {
+    "id": "ROOT-5",
+    "layer": "input",
+    "type": "simple",
+    "bodyPartId": "ROOT",
+    "ioId": 5,
+    "gain": 1.0
+   }
+  ],
+  "connection": [
+   {
+    "src": "PARTGEN_772912784-0",
+    "dest": "PARTGEN_772912784-0",
+    "weight": -1.8205058574676514
+   },
+   {
+    "src": "ROOT-0",
+    "dest": "PARTGEN_772912784-0",
+    "weight": 3.0
+   },
+   {
+    "src": "ROOT-1",
+    "dest": "PARTGEN_772912784-0",
+    "weight": -1.7025909423828125
+   },
+   {
+    "src": "ROOT-2",
+    "dest": "PARTGEN_772912784-0",
+    "weight": 0.37972095608711243
+   },
+   {
+    "src": "ROOT-3",
+    "dest": "PARTGEN_772912784-0",
+    "weight": 2.1668570041656494
+   },
+   {
+    "src": "ROOT-4",
+    "dest": "PARTGEN_772912784-0",
+    "weight": -3.0
+   },
+   {
+    "src": "ROOT-5",
+    "dest": "PARTGEN_772912784-0",
+    "weight": -2.8460140228271484
+   }
+  ]
+ }
+}

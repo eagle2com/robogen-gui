@@ -20,8 +20,10 @@ public:
     EvolutionConfiguration* current_config = nullptr;
     void saveAll();
     void loadAll();
+    void writeEvolution(const QString& project_path, int n_threads);
+    int getMaxGenerations();
 
-private:
+public:
     Ui::EvolutionConfigForm *ui;
 
 private slots:

@@ -3,6 +3,11 @@
 
 #include <QWidget>
 #include "configurations.h"
+#include "robotconfigform.h"
+#include "evolutionconfigform.h"
+#include "simulationconfigform.h"
+#include <QList>
+#include <QProcess>
 
 namespace Ui {
 class ConfigOverviewForm;
@@ -19,12 +24,24 @@ public:
     void loadAll();
     void saveAll();
 
+    void* main_window = nullptr;
+
+    RobotConfigForm* robot_form = nullptr;
+    SimulationConfigForm* simulation_form = nullptr;
+    EvolutionConfigForm* evolution_form = nullptr;
+
+   // QString project_path = "";
+
+    void refresh_run_list();
+    void refresh_generation_list(const QString &run_name);
+
 private slots:
     void onNameChange();
-
+    void onRunItemChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
 private:
     Ui::ConfigOverviewForm *ui;
+
 };
 
 #endif // CONFIGOVERVIEWFORM_H

@@ -31,6 +31,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    QString project_directory = "";
+    QString getRobogenPath();
+
 public slots:
     void onProjectTreeSelect(QTreeWidgetItem*,int);
     void onProjectTreeAdd();
@@ -39,11 +42,6 @@ public slots:
     void loadSimulation();
     void loadEvolution();
 
-    void saveSimulation();
-    void saveEvolution();
-    void saveRobot();
-
-    void onPushEvolve();
     void onPushSimulate();
     void onPushAnalyze();
     void onPushStop();
@@ -57,33 +55,38 @@ public slots:
 
     void onNewProject();
     void onOpenProject();
-    void onSaveProject();
+    bool onSaveProject();
+
+    void onEvolve();
 
 private:
     Ui::MainWindow *ui;
 
+    QFileSystemWatcher *fs_watcher = nullptr;
 
-    QString project_path;
+    int n_generation;
+
+    bool first_dir_change = true;
+    bool run_dir_added = false;
 
     QProcess *process_server;
     QProcess *process_evolve;
     QProcess *process_simulate;
 
     QList<QProcess*> process_list;
-
-    QFileSystemWatcher *fs_watcher = nullptr;
-
-    int n_generation;
-
-    QString project_directory = "";
-
-    QFileSystemWatcher* tmp_directory_watcher = nullptr;
+    DirWatcher dir_watcher;
 
     SimulationConfigForm *simulation_config_form = nullptr;
     EvolutionConfigForm* evolution_config_form = nullptr;
     RobotConfigForm* robot_config_form = nullptr;
     ConfigOverviewForm* overview_form = nullptr;
     SettingsWindow* settings_window = nullptr;
+
+    ProjectConfiguration* current_config = nullptr;
+    ProjectConfiguration* current_running_config = nullptr;
+    QString current_run_path = "";
+
+    void closeEvent(QCloseEvent* ev);
 };
 
 #endif // MAINWINDOW_H

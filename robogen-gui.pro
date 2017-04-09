@@ -11,9 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = robogen-gui
 TEMPLATE = app
 
-!win32 {
-    QMAKE_CXXFLAGS += -std=c++11
-}
+
+#QMAKE_CXXFLAGS += -std=c++14
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -48,4 +48,5 @@ RESOURCES += \
     res.qrc
 
 DISTFILES += \
-    TODO
+    TODO \
+    test.py

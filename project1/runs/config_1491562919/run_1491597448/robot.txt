@@ -1,0 +1,2 @@
+0 CoreComponent ROOT 0
+	0 ActiveHinge PARTGEN_2738546944 0

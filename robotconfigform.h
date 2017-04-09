@@ -5,6 +5,7 @@
 #include <QTreeWidgetItem>
 #include "configurations.h"
 
+class MainWindow;
 
 namespace Ui {
 class RobotConfigForm;
@@ -22,6 +23,9 @@ public:
     RobotConfiguration* current_config = nullptr;
     void loadAll();
     void saveAll();
+    static QString stringFromType(PART_TYPE tp);
+    static PART_TYPE typeFromString(const QString& str);
+    void writeRobot(const QString& project_path);
 
 private slots:
     void onAddPart();
@@ -39,11 +43,10 @@ private slots:
 
 
 
-
-private:
+public:
     Ui::RobotConfigForm *ui;
-    PART_TYPE typeFromString(QString str);
-    QString stringFromType(PART_TYPE tp);
+
+
 };
 
 #endif // ROBOTCONFIGFORM_H

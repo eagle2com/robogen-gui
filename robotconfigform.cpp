@@ -7,6 +7,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include <thread>
+#include <chrono>
+
 RobotConfigForm::RobotConfigForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RobotConfigForm)
@@ -94,103 +97,14 @@ void RobotConfigForm::onLoadRobot()
         return;
 
     QString filename = QFileDialog::getOpenFileName(this,"Choose robot config file", "", "*.json *.txt");
-    //qDebug() << filename;
-
-    QString extension;
-    {
-        QStringList tokens = filename.split('.');
-        extension = tokens.back();
-    }
-
-    if(extension == "json")
-    {
-        loadRobotJson(filename);
+    if(filename == "")
         return;
-    }
 
-    QFile file(filename);
+    current_config->loadRobot(filename);
+    ui->robotConfigTree->clear();
+    ui->robotConfigTree->addTopLevelItem(current_config->root_part);
+    ui->robotConfigTree->expandAll();
 
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&file);
-        QString line;
-
-        //ui->robotConfigTree->clear();
-        current_config->robot_part_hash.clear();
-
-        if(current_config->root_part) delete current_config->root_part;
-        current_config->root_part = new RobotPart();
-        current_config->root_part->type = PART_TYPE::CORE_COMPONENT;
-
-        in.readLine();
-        RobotPart* current_parent = current_config->root_part;
-        RobotPart *new_part = nullptr;
-        RobotPart *prev_part = nullptr;
-        int tabs = 1;
-
-        while(in.readLineInto(&line) && !line.isEmpty())
-        {
-            QStringList tokens = line.split(QRegularExpression("[ \t]"));
-            int ctabs = 0;
-            //qDebug() << tokens;
-            while(tokens.front().isEmpty())
-            {
-                ctabs++;
-                tokens.pop_front();
-            }
-
-            new_part = new RobotPart;
-
-            new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
-            QString type = tokens.front(); tokens.pop_front();
-
-            new_part->type = typeFromString(type);
-            new_part->name = tokens.front(); tokens.pop_front();
-            new_part->rotation = tokens.front().toInt(); tokens.pop_front();
-
-            if(new_part->type == PART_TYPE::PARAMETRIC_JOINT)
-            {
-                new_part->param_length = tokens.front().toDouble(); tokens.pop_front();
-                new_part->param_rotation = tokens.front().toDouble(); tokens.pop_front();
-                // We leave the last 0 to rot because we dont need it
-            }
-
-            if(ctabs == tabs)
-            {
-                current_parent->addChild(new_part);
-            }
-            else if(ctabs > tabs)
-            {
-                tabs = ctabs;
-                prev_part->addChild(new_part);
-                current_parent = prev_part;
-            }
-            else
-            {
-                while(ctabs < tabs)
-                {
-                    current_parent = (RobotPart*)current_parent->parent();
-                    tabs--;
-                }
-
-                tabs = ctabs;
-                current_parent->addChild(new_part);
-            }
-
-            new_part->update();
-            current_config->robot_part_hash.insert(new_part->name, new_part);
-            current_config->root_part->update();
-
-            prev_part = new_part;
-        }
-
-        ui->robotConfigTree->addTopLevelItem(current_config->root_part);
-        ui->robotConfigTree->expandAll();
-    }
-    else
-    {
-        qDebug() << "FAILED TO OPEN ROBOT FILE: " << filename <<endl;
-    }
 }
 
 void RobotConfigForm::loadRobotJson(const QString &filename)
@@ -260,6 +174,7 @@ void RobotConfigForm::saveAll()
 
 QJsonObject RobotConfigForm::getPartJsonObject(RobotPart* part)
 {
+    QJsonObject obj;
     /*QJsonObject obj;
     QString type;
     QString name;
@@ -322,6 +237,7 @@ QJsonObject RobotConfigForm::getPartJsonObject(RobotPart* part)
     }
 
     return obj;*/
+    return obj;
 }
 
 QJsonObject RobotConfigForm::getRobotJsonObject()
@@ -461,7 +377,7 @@ void RobotConfigForm::onRobotParamRotationChange(int value)
 }
 
 
-PART_TYPE RobotConfigForm::typeFromString(QString str)
+PART_TYPE RobotConfigForm::typeFromString(const QString& str)
 {
 
     PART_TYPE type = PART_TYPE::PASSIVE_HINGE;
@@ -497,6 +413,59 @@ PART_TYPE RobotConfigForm::typeFromString(QString str)
     }
 
     return type;
+}
+
+
+void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
+{
+    QString name;
+    QString type = RobotConfigForm::stringFromType(part->type);
+
+    for(int i = 0; i < tab; i++)
+    {
+        stream << "\t";
+    }
+    name = part->name;
+    if(name.isEmpty())
+        name = "PARTGEN_" + QString::number((ulong)part);
+
+    stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
+    if(part->type == PART_TYPE::PARAMETRIC_JOINT)
+    {
+        // The last param is the inclination, which is disabled for now and force to 0
+        stream << " " << part->param_length << " " << part->param_rotation <<" 0";
+    }
+    //FIXME Dirty hack
+    if(part->type == PART_TYPE::ACTIVE_WHEEL || part->type == PART_TYPE::PASSIVE_WHEEL)
+    {
+        // radius?
+        stream << " " << 0.04;
+    }
+    stream << endl;
+
+    for(int i = 0; i < part->childCount(); i++)
+    {
+        writeRobotPart(dynamic_cast<RobotPart*>(part->child(i)), tab+1,stream);
+    }
+}
+
+void RobotConfigForm::writeRobot(const QString &project_path)
+{
+    QString filename = project_path + "/tmp/robot.txt";
+
+    QFile file(filename);
+    if ( file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
+    {
+        QTextStream stream( &file );
+        writeRobotPart(current_config->root_part, 0, stream);
+        //FIXME Dirty hack
+        //stream << "\n\n\nLeftWheel 0 100" << endl;
+        //stream << "RightWheel 0 -100" << endl;
+    }
+    else
+    {
+        qDebug() << "FAILED TO SAVE ROBOT TO: " << filename << endl;
+    }
 }
 
 QString RobotConfigForm::stringFromType(PART_TYPE tp)

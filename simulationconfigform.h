@@ -18,8 +18,9 @@ public:
     SimulationConfiguration* current_config = nullptr;
     void saveAll();
     void loadAll();
+    void writeSimulation(const QString& project_path);
 
-private:
+public:
     Ui::SimulationConfigForm *ui;
 };
 

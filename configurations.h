@@ -125,7 +125,10 @@ public:
 
     RobotPart* root_part = nullptr;
     QHash<QString, RobotPart*> robot_part_hash;
-
+    QJsonObject get_json();
+    bool loadRobot(const QString& filename = "");
+    bool loadRobotJson(const QString& filename, QWidget *parent = nullptr);
+    bool loadRobotFromObject(const QJsonObject& obj);
 };
 
 class SimulationConfiguration: public ConfigurationItem {
@@ -158,6 +161,8 @@ public:
     RobotConfiguration* robot = nullptr;
     SimulationConfiguration* simulation = nullptr;
     EvolutionConfiguration* evolution = nullptr;
+    QString root_directory = "";
+    QStringList run_directories;
 };
 
 

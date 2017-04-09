@@ -20,92 +20,160 @@
    <string>Robogen GUI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QTreeWidget" name="tree_project">
+       <widget class="QTreeWidget" name="tree_project">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
+        <property name="animated">
+         <bool>false</bool>
+        </property>
+        <property name="expandsOnDoubleClick">
+         <bool>false</bool>
+        </property>
+        <property name="columnCount">
+         <number>1</number>
+        </property>
+        <column>
+         <property name="text">
+          <string>Configurations</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="2" column="1">
+         <widget class="QProgressBar" name="progressBar">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>50</width>
-            <height>0</height>
-           </size>
+          <property name="maximum">
+           <number>1</number>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
+          <property name="value">
+           <number>0</number>
           </property>
-          <property name="baseSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
+          <property name="format">
+           <string>%v/%m</string>
           </property>
-          <property name="focusPolicy">
-           <enum>Qt::ClickFocus</enum>
-          </property>
-          <property name="animated">
-           <bool>false</bool>
-          </property>
-          <property name="expandsOnDoubleClick">
-           <bool>false</bool>
-          </property>
-          <column>
-           <property name="text">
-            <string>Configurations</string>
-           </property>
-          </column>
          </widget>
         </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QPushButton" name="push_add">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="res.qrc">
-              <normaloff>:/imgs/plus</normaloff>:/imgs/plus</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="push_remove">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="res.qrc">
-              <normaloff>:/imgs/minus</normaloff>:/imgs/minus</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="push_evolve">
+          <property name="text">
+           <string>Evolve</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="push_remove">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res.qrc">
+            <normaloff>:/imgs/minus</normaloff>:/imgs/minus</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="push_stop">
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="push_simulate">
+          <property name="text">
+           <string>Simulate</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QPushButton" name="push_add">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="res.qrc">
+            <normaloff>:/imgs/plus</normaloff>:/imgs/plus</iconset>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_threads">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Number of parallel threads</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="spin_threads">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QFrame" name="main_frame">
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QFrame" name="main_frame">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -115,7 +183,7 @@
      <x>0</x>
      <y>0</y>
      <width>896</width>
-     <height>19</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -128,6 +196,8 @@
     <addaction name="action_save_project_as"/>
     <addaction name="separator"/>
     <addaction name="action_settings"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -223,6 +293,9 @@
    <property name="text">
     <string>&amp;Open Project</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="action_save_project">
    <property name="text">
@@ -245,10 +318,35 @@
     <string>S&amp;ettings</string>
    </property>
   </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
   <include location="res.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>447</x>
+     <y>291</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

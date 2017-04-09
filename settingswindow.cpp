@@ -1,6 +1,7 @@
 #include "settingswindow.h"
 #include "ui_settingswindow.h"
 #include <QFileDialog>
+#include <QDebug>
 
 SettingsWindow::SettingsWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,6 +24,7 @@ QString SettingsWindow::get_robogen_directory()
 void SettingsWindow::set_robogen_directory(const QString &dir)
 {
     ui->line_robogen->setText(dir);
+    qDebug() << "robogen build path: " << dir;
 }
 
 void SettingsWindow::onPushBrowse()

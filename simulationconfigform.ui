@@ -17,6 +17,22 @@
    <item row="0" column="0">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QGridLayout" name="gridLayout_7">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_32">
+        <property name="text">
+         <string># Time Steps</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="combo_terraintype">
+        <item>
+         <property name="text">
+          <string>flat</string>
+         </property>
+        </item>
+       </widget>
+      </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_31">
         <property name="text">
@@ -24,20 +40,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="2">
+      <item row="0" column="3">
        <widget class="QCheckBox" name="check_customscenario">
         <property name="enabled">
          <bool>false</bool>
@@ -66,36 +69,6 @@
         </item>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_32">
-        <property name="text">
-         <string># Time Steps</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="combo_terraintype">
-        <item>
-         <property name="text">
-          <string>flat</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_35">
-        <property name="text">
-         <string>Terrain Width</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label_38">
-        <property name="text">
-         <string>Motor Noise Level</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="1">
        <widget class="QDoubleSpinBox" name="dspin_terrainlength">
         <property name="decimals">
@@ -116,20 +89,34 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_34">
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_35">
         <property name="text">
-         <string>Terrain Length</string>
+         <string>Terrain Width</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QDoubleSpinBox" name="dspin_terrainwidth">
+      <item row="9" column="0">
+       <widget class="QLabel" name="label_38">
+        <property name="text">
+         <string>Motor Noise Level</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QDoubleSpinBox" name="dspin_terrainfriction">
         <property name="decimals">
          <number>5</number>
         </property>
         <property name="value">
-         <double>5.000000000000000</double>
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_34">
+        <property name="text">
+         <string>Terrain Length</string>
         </property>
        </widget>
       </item>
@@ -146,23 +133,6 @@
         </property>
        </spacer>
       </item>
-      <item row="10" column="1">
-       <widget class="QCheckBox" name="check_capacceleration">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QDoubleSpinBox" name="dspin_terrainfriction">
-        <property name="decimals">
-         <number>5</number>
-        </property>
-        <property name="value">
-         <double>1.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="10" column="0">
        <widget class="QLabel" name="label_39">
         <property name="text">
@@ -170,10 +140,20 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_30">
+      <item row="10" column="1">
+       <widget class="QCheckBox" name="check_capacceleration">
         <property name="text">
-         <string>Time Step</string>
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QDoubleSpinBox" name="dspin_terrainwidth">
+        <property name="decimals">
+         <number>5</number>
+        </property>
+        <property name="value">
+         <double>5.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -184,10 +164,10 @@
         </property>
        </widget>
       </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label_37">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_30">
         <property name="text">
-         <string>Sensor Noise Level</string>
+         <string>Time Step</string>
         </property>
        </widget>
       </item>
@@ -201,20 +181,10 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="dspin_actuationfrequency">
-        <property name="decimals">
-         <number>5</number>
-        </property>
-        <property name="value">
-         <double>25.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0">
-       <widget class="QLabel" name="label_36">
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_37">
         <property name="text">
-         <string>Terrain Friction</string>
+         <string>Sensor Noise Level</string>
         </property>
        </widget>
       </item>
@@ -235,14 +205,31 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item row="0" column="4">
        <widget class="QLineEdit" name="line_scenario">
         <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_36">
+        <property name="text">
+         <string>Terrain Friction</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="dspin_actuationfrequency">
+        <property name="decimals">
+         <number>5</number>
+        </property>
+        <property name="value">
+         <double>25.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
        <widget class="QPushButton" name="push_browsescenario">
         <property name="enabled">
          <bool>false</bool>
@@ -278,6 +265,19 @@
          <number>800</number>
         </property>
        </widget>
+      </item>
+      <item row="0" column="2">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>

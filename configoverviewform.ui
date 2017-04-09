@@ -17,20 +17,6 @@
    <item row="0" column="2">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="push_evolve">
-       <property name="text">
-        <string>Evolve</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="push_simulate">
-       <property name="text">
-        <string>Simulate</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="push_analyze">
        <property name="text">
         <string>Analyze</string>
@@ -57,6 +43,15 @@
    </item>
    <item row="0" column="0">
     <widget class="QTreeWidget" name="tree_runs">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="itemsExpandable">
+      <bool>false</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string>Runs</string>
@@ -66,6 +61,12 @@
    </item>
    <item row="0" column="1">
     <widget class="QTreeWidget" name="tree_generations">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
      <column>
       <property name="text">
        <string>Generations</string>

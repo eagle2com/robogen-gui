@@ -16,53 +16,41 @@
                 "dspin_psubtreeduplicate": 0.2,
                 "dspin_psubtreeremove": 0.1,
                 "dspin_psubtreeswap": 0.2,
-                "spin_generations": 50,
+                "spin_generations": 5,
                 "spin_lambda": 20,
                 "spin_maxbodyparts": 1000,
                 "spin_mu": 20,
                 "spin_seed": 0,
-                "spin_threads": 1,
                 "spin_tournament": 2
             },
             "name": "Configuration 1",
-            "simulation": {
-                "combo_scenario": "racing",
-                "combo_terraintype": "flat",
-                "dspin_actuationfrequency": 25,
-                "dspin_motornoiselevel": 0,
-                "dspin_sensornoiselevel": 0,
-                "dspin_terrainfriction": 1,
-                "dspin_terrainlength": 5,
-                "dspin_terrainwidth": 5,
-                "dspin_timestep": 0.005,
-                "spin_ntimesteps": 800
-            }
-        },
-        {
-            "evolution": {
-                "combo_evolutionaryalgorithm": "Basic",
-                "combo_evolutionmode": "brain",
-                "combo_replacement": "plus",
-                "combo_selection": "deterministic-tournament",
-                "dspin_brainsigma": 0.7,
-                "dspin_paddhiddenneuron": 0,
-                "dspin_pbraincrossover": 0,
-                "dspin_pbrainmutate": 0.3,
-                "dspin_pnodeinsert": 0.5,
-                "dspin_pnoderemove": 0.1,
-                "dspin_pparemetermodify": 0.1,
-                "dspin_psubtreeduplicate": 0.2,
-                "dspin_psubtreeremove": 0.1,
-                "dspin_psubtreeswap": 0.2,
-                "spin_generations": 50,
-                "spin_lambda": 20,
-                "spin_maxbodyparts": 1000,
-                "spin_mu": 20,
-                "spin_seed": 0,
-                "spin_threads": 1,
-                "spin_tournament": 2
+            "robot": {
+                "body": {
+                    "connection": [
+                        {
+                            "dest": "",
+                            "destSlot": 0,
+                            "src": "ROOT",
+                            "srcSlot": 0
+                        }
+                    ],
+                    "part": [
+                        {
+                            "id": "ROOT",
+                            "orientation": 0,
+                            "root": true,
+                            "type": "CoreComponent"
+                        },
+                        {
+                            "id": "",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        }
+                    ]
+                }
             },
-            "name": "Configuration 1",
+            "root_directory": "E:/dev/robogen-gui/project1/runs/config_1491562919",
             "simulation": {
                 "combo_scenario": "racing",
                 "combo_terraintype": "flat",
@@ -77,5 +65,5 @@
             }
         }
     ],
-    "robogen_directory": ""
+    "robogen_directory": "E:/apps/robogen-windows/run"
 }
