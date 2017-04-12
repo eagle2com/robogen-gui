@@ -23,214 +23,28 @@
                 "spin_seed": 0,
                 "spin_tournament": 2
             },
-            "name": "New Configuration",
+            "name": "test1",
             "robot": {
                 "body": {
                     "connection": [
-                        {
-                            "dest": "Hip1",
-                            "destSlot": 0,
-                            "src": "Core",
-                            "srcSlot": 0
-                        },
-                        {
-                            "dest": "UpperLeg1",
-                            "destSlot": 0,
-                            "src": "Hip1",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Knee1",
-                            "destSlot": 0,
-                            "src": "UpperLeg1",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "LowerLeg1",
-                            "destSlot": 0,
-                            "src": "Knee1",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Hip2",
-                            "destSlot": 0,
-                            "src": "Core",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "UpperLeg2",
-                            "destSlot": 0,
-                            "src": "Hip2",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Knee2",
-                            "destSlot": 0,
-                            "src": "UpperLeg2",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "LowerLeg2",
-                            "destSlot": 0,
-                            "src": "Knee2",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Hip3",
-                            "destSlot": 0,
-                            "src": "Core",
-                            "srcSlot": 2
-                        },
-                        {
-                            "dest": "UpperLeg3",
-                            "destSlot": 0,
-                            "src": "Hip3",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Knee3",
-                            "destSlot": 0,
-                            "src": "UpperLeg3",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "LowerLeg3",
-                            "destSlot": 0,
-                            "src": "Knee3",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Hip4",
-                            "destSlot": 0,
-                            "src": "Core",
-                            "srcSlot": 3
-                        },
-                        {
-                            "dest": "UpperLeg4",
-                            "destSlot": 0,
-                            "src": "Hip4",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "Knee4",
-                            "destSlot": 0,
-                            "src": "UpperLeg4",
-                            "srcSlot": 1
-                        },
-                        {
-                            "dest": "LowerLeg4",
-                            "destSlot": 0,
-                            "src": "Knee4",
-                            "srcSlot": 1
-                        }
                     ],
                     "part": [
                         {
-                            "id": "Core",
+                            "id": "ROOT",
                             "orientation": 0,
                             "root": true,
                             "type": "CoreComponent"
-                        },
-                        {
-                            "id": "Hip1",
-                            "orientation": 1,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "UpperLeg1",
-                            "orientation": 1,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Knee1",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "LowerLeg1",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Hip2",
-                            "orientation": 3,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "UpperLeg2",
-                            "orientation": 1,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Knee2",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "LowerLeg2",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Hip3",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "UpperLeg3",
-                            "orientation": 1,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Knee3",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "LowerLeg3",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Hip4",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "UpperLeg4",
-                            "orientation": 1,
-                            "root": false,
-                            "type": "FixedBrick"
-                        },
-                        {
-                            "id": "Knee4",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "ActiveHinge"
-                        },
-                        {
-                            "id": "LowerLeg4",
-                            "orientation": 0,
-                            "root": false,
-                            "type": "FixedBrick"
                         }
                     ]
                 }
             },
-            "root_directory": "E:/dev/robogen-gui/project1/runs/config_1491997005",
+            "root_directory": "E:/dev/robogen-gui/project1/runs/config_1492033424",
+            "run_list": [
+                {
+                    "name": "run_1492033424",
+                    "path": "run_1492033424"
+                }
+            ],
             "simulation": {
                 "combo_scenario": "racing",
                 "combo_terraintype": "flat",

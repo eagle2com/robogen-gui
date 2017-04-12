@@ -10,10 +10,6 @@
 #include <QJsonObject>
 #include "dirwatcher.h"
 
-#include "robotconfigform.h"
-#include "simulationconfigform.h"
-#include "evolutionconfigform.h"
-#include "configoverviewform.h"
 #include "settingswindow.h"
 
 #include "configurations.h"
@@ -40,7 +36,7 @@ public:
     QJsonObject getPartJsonObject(RobotPart* part);
 
 public slots:
-    void onProjectTreeSelect(QTreeWidgetItem*,int);
+    void onProjectTreeSelect(QListWidgetItem*);
     void onProjectTreeAdd();
     void onProjectTreeRemove();
 
@@ -64,8 +60,6 @@ public slots:
 
     void onEvolve();
 
-    void onOverviewNameEditFinished();
-
     void saveSimulation();
     void loadSimulation();
 
@@ -87,8 +81,11 @@ private slots:
     void onRobotParamRotationChange(int value);
     void onItemChange(QTreeWidgetItem *, QTreeWidgetItem *);
 
-    void onRunSelect(QTreeWidgetItem*item_, int);
+    void onRunSelect(QListWidgetItem* current);
+    void onRunDeletePressed();
+    void onRunItemDoubleClicked(QListWidgetItem *item);
 
+    void onProjectConfigDoubleClicked(QListWidgetItem* item);
     void onLoadRobot();
     void loadRobotJson(const QString& filename);
 

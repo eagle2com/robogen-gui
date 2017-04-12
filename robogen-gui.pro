@@ -15,29 +15,31 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     qcustomplot.cpp \
     dirwatcher.cpp \
-    evolutionconfigform.cpp \
-    simulationconfigform.cpp \
-    robotconfigform.cpp \
-    configoverviewform.cpp \
+   # evolutionconfigform.cpp \
+   # simulationconfigform.cpp \
+   # robotconfigform.cpp \
+   # configoverviewform.cpp \
     settingswindow.cpp \
-    configurations.cpp
+    configurations.cpp \
+    customlistwidget.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
     dirwatcher.h \
-    evolutionconfigform.h \
-    simulationconfigform.h \
-    robotconfigform.h \
-    configoverviewform.h \
+    #evolutionconfigform.h \
+    #simulationconfigform.h \
+    #robotconfigform.h \
+    #configoverviewform.h \
     settingswindow.h \
-    configurations.h
+    configurations.h \
+    customlistwidget.h
 
 FORMS    += mainwindow.ui \
-    testwindow.ui \
-    evolutionconfigform.ui \
-    simulationconfigform.ui \
-    robotconfigform.ui \
-    configoverviewform.ui \
+    #testwindow.ui \
+    #evolutionconfigform.ui \
+    #simulationconfigform.ui \
+    #robotconfigform.ui \
+    #configoverviewform.ui \
     settingswindow.ui
 
 RESOURCES += \

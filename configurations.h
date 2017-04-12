@@ -4,7 +4,7 @@
 #include <QTreeWidget>
 #include <QJsonObject>
 #include <map>
-
+#include <QListWidget>
 
 enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR, ACTIVE_WHEEL, PASSIVE_WHEEL};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};
@@ -108,13 +108,10 @@ public:
     }
 };
 
-class GenerationTreeItem: public QTreeWidgetItem {
-public:
-};
 
-class RunTreeItem: public QTreeWidgetItem {
+class RunTreeItem: public QListWidgetItem {
 public:
-    QList<GenerationTreeItem*> generations;
+    QString path;
 };
 
 
@@ -151,7 +148,7 @@ public:
 };
 
 
-class ProjectConfiguration: public QTreeWidgetItem {
+class ProjectConfiguration: public QListWidgetItem {
 public:
     ProjectConfiguration(QObject* parent = nullptr);
     RobotConfiguration* robot = nullptr;

@@ -7,9 +7,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDebug>
-
-#include "robotconfigform.h"
-
+#include <mainwindow.h>
 
 ProjectConfiguration::ProjectConfiguration(QObject *parent)
 {
@@ -48,7 +46,7 @@ QJsonObject RobotConfiguration::get_json()
 
         if(part->name.isEmpty()) part->name = "PARTGEN_" + QString::number((ulong)part);
         part_obj["id"] = part->name;
-        part_obj["type"] = RobotConfigForm::stringFromType(part->type); //TODO move this elsewhere
+        part_obj["type"] = MainWindow::stringFromType(part->type); //TODO move this elsewhere
         part_obj["root"] = part->parent() == nullptr? true:false;
         part_obj["orientation"] = part->rotation;
 
@@ -124,7 +122,7 @@ bool RobotConfiguration::loadRobot(const QString &filename)
             new_part->face = (PART_FACE)tokens.front().toInt(); tokens.pop_front();
             QString type = tokens.front(); tokens.pop_front();
 
-            new_part->type = RobotConfigForm::typeFromString(type);
+            new_part->type = MainWindow::typeFromString(type);
             new_part->name = tokens.front(); tokens.pop_front();
             new_part->rotation = tokens.front().toInt(); tokens.pop_front();
 
@@ -202,7 +200,7 @@ bool RobotConfiguration::loadRobotJson(const QString &filename, QWidget* parent)
     {
         RobotPart *new_part = new RobotPart;
         new_part->name = part.toObject()["id"].toString();
-        new_part->type = RobotConfigForm::typeFromString(part.toObject()["type"].toString());
+        new_part->type = MainWindow::typeFromString(part.toObject()["type"].toString());
         //qDebug() << "type string: " << part.toObject()["type"].toString();
         new_part->rotation = part.toObject()["orientation"].toInt();
         if(new_part->type == PART_TYPE::CORE_COMPONENT)
@@ -243,7 +241,7 @@ bool RobotConfiguration::loadRobotFromObject(const QJsonObject &obj)
     {
         RobotPart *new_part = new RobotPart;
         new_part->name = part.toObject()["id"].toString();
-        new_part->type = RobotConfigForm::typeFromString(part.toObject()["type"].toString());
+        new_part->type = MainWindow::typeFromString(part.toObject()["type"].toString());
         //qDebug() << "type string: " << part.toObject()["type"].toString();
         new_part->rotation = part.toObject()["orientation"].toInt();
         if(new_part->type == PART_TYPE::CORE_COMPONENT)

@@ -22,6 +22,7 @@ using namespace std::chrono;
 
 using std::cout;
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     settings_window = new SettingsWindow(this);
     settings_window->hide();
 
-    connect(ui->tree_project, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
+    connect(ui->tree_project, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onProjectTreeSelect(QListWidgetItem*)));
     //connect(ui->tree_project, SIGNAL(itemEntered(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
     //connect(ui->tree_project, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(onProjectTreeSelect(QTreeWidgetItem*,int)));
 
@@ -61,10 +62,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // ========================== OVERVIEW TAB SETUP ===================================
-    connect(ui->line_name, SIGNAL(editingFinished()), this, SLOT(onOverviewNameEditFinished()));
-    connect(ui->tree_runs, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onRunSelect(QTreeWidgetItem*,int)));
+    connect(ui->tree_runs, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(onRunSelect(QListWidgetItem*)));
+    connect(ui->tree_runs, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(onRunSelect(QListWidgetItem*)));
+
     connect(ui->push_simulate, SIGNAL(clicked(bool)), this, SLOT(onPushSimulate()));
     connect(ui->push_analyze, SIGNAL(clicked(bool)), this, SLOT(onPushAnalyze()));
+
+    connect(ui->tree_runs, SIGNAL(deletePressed()), this, SLOT(onRunDeletePressed()));
+    connect(ui->tree_runs, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onRunItemDoubleClicked(QListWidgetItem*)));
+    connect(ui->tree_project, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onProjectConfigDoubleClicked(QListWidgetItem*)));
+
+   // connect(ui->tabWidge)
 
     // ========================== EVOLUTION TAB SETUP =================================
 
@@ -179,9 +187,9 @@ void MainWindow::onPushSimulate()
     if(!ui->tree_runs->currentItem()) return;
     if(!ui->list_generations->currentItem()) return;
     RunTreeItem* run_item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
-    QString generation_path = current_config->root_directory + "/" + run_item->text(0) + "/"+ ui->list_generations->currentItem()->text();
+    QString generation_path = current_config->root_directory + "/" + run_item->path + "/"+ ui->list_generations->currentItem()->text();
 
-    arguments << generation_path << current_config->root_directory + "/" + run_item->text(0) + "/sim.txt";
+    arguments << generation_path << current_config->root_directory + "/" + run_item->path + "/sim.txt";
     process_simulate = new QProcess(this);
     process_simulate->setWorkingDirectory(settings_window->get_robogen_directory());
     process_simulate->start(program, arguments);
@@ -191,7 +199,8 @@ void MainWindow::onPushAnalyze()
 {
     if(!current_config) return;
     if(!ui->tree_runs->currentItem()) return;
-    QString path = current_config->root_directory + "/" + ui->tree_runs->currentItem()->text(0) + "/BestAvgStd.txt";
+    RunTreeItem* item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+    QString path = current_config->root_directory + "/" + item->path + "/BestAvgStd.txt";
 
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -316,7 +325,7 @@ void MainWindow::onFileChanged(QString filename)
 
         if(current_config == current_running_config){
             // If the current run is selected in the run list, update the generations list
-            if(ui->tree_runs->currentItem() && ui->tree_runs->currentItem()->text(0) == current_run_name) {
+            if(ui->tree_runs->currentItem() && ui->tree_runs->currentItem()->text() == current_run_name) {
                 for(auto& gen_item: list) {
                     // If the item is not yet in the generation list, add it
                     if(ui->list_generations->findItems(gen_item, Qt::MatchExactly).empty()) {
@@ -412,10 +421,10 @@ void MainWindow::onOpenProject()
     for(int i = 0; i < configs.size(); i++) {
         QJsonObject config = configs[i].toObject();
         ProjectConfiguration* project1_config = new ProjectConfiguration();
-        project1_config->setText(0, config["name"].toString());
+        project1_config->setText(config["name"].toString());
         project1_config->root_directory = config["root_directory"].toString();
         qDebug() << "found root_directory: " << project1_config->root_directory;
-        ui->tree_project->addTopLevelItem(project1_config);
+        ui->tree_project->addItem(project1_config);
 
         QJsonObject simulation_obj = config["simulation"].toObject();
         QJsonObject evolution_obj = config["evolution"].toObject();
@@ -446,8 +455,10 @@ void MainWindow::onOpenProject()
         }
 
         for(auto& run_item: run_array) {
+            QJsonObject run_obj = run_item.toObject();
             RunTreeItem* new_run_item = new RunTreeItem();
-            new_run_item->setText(0, run_item.toString());
+            new_run_item->setText(run_obj["name"].toString());
+            new_run_item->path = run_obj["path"].toString();
             project1_config->run_list.append(new_run_item);
         }
 
@@ -488,8 +499,8 @@ bool MainWindow::onSaveProject()
     main_object["robogen_directory"] = settings_window->get_robogen_directory();
 
     QJsonArray config_array;
-    for(int i = 0; i < ui->tree_project->topLevelItemCount(); i++) {
-        ProjectConfiguration* config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(i));
+    for(int i = 0; i < ui->tree_project->count(); i++) {
+        ProjectConfiguration* config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->item(i));
         QJsonObject config_obj;
         QJsonObject evolution_obj;
         QJsonArray run_array;
@@ -521,11 +532,14 @@ bool MainWindow::onSaveProject()
         }
 
         for(auto& run_item: config->run_list) {
-            run_array.push_back(run_item->text(0));
+            QJsonObject run_obj;
+            run_obj["name"] = run_item->text();
+            run_obj["path"] = run_item->path;
+            run_array.push_back(run_obj);
         }
 
         config_obj["simulation"] = simulation_obj;
-        config_obj["name"] = config->text(0);
+        config_obj["name"] = config->text();
         config_obj["robot"] = config->robot->get_json();
         config_obj["root_directory"] = config->root_directory;
         config_obj["run_list"] = run_array;
@@ -596,19 +610,27 @@ void MainWindow::onEvolve()
     qDebug() << "current run path: " << current_run_path;
 
     RunTreeItem* run_item = new RunTreeItem();
-    run_item->setText(0, current_run_name);
+    run_item->setText(current_run_name);
+    run_item->path = current_run_name;
     current_running_config->run_list.append(run_item);
     if(current_config == current_running_config) {
-        ui->tree_runs->addTopLevelItem(run_item);
+        ui->tree_runs->addItem(run_item);
     }
 
     //ui->tree_runs->addTopLevelItem();
 
+
+
+    QString robogen_path = settings_window->get_robogen_directory();
+    QFile robogen_server_file(robogen_path + "/robogen-server.exe");
+    if(!robogen_server_file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, "Error", "Could not find robogen-server.exe in the robogen directory, please check file->settings");
+        return;
+    }
+
     ui->push_evolve->setDisabled(true);
     ui->push_stop->setEnabled(true);
     ui->progressBar->setValue(0);
-
-    QString robogen_path = settings_window->get_robogen_directory();
 
     // Launch the server(s)
     {
@@ -664,13 +686,6 @@ void MainWindow::onEvolve()
     }
 
     // dir_watcher.watch(project_directory + "/tmp/run/",100);
-}
-
-void MainWindow::onOverviewNameEditFinished()
-{
-    if(current_config) {
-        current_config->setText(0, ui->line_name->text());
-    }
 }
 
 void MainWindow::saveSimulation()
@@ -782,6 +797,7 @@ void MainWindow::loadRobot()
     if(current_config) {
         //qDebug() << "loadRobot" << endl;
         ui->robotConfigTree->addTopLevelItem(current_config->robot->root_part);
+        ui->robotConfigTree->expandAll();
     }
 }
 
@@ -793,16 +809,17 @@ void MainWindow::closeEvent(QCloseEvent *ev)
     ev->accept();
 }
 
-void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
+void MainWindow::onProjectTreeSelect(QListWidgetItem *item_)
 {
     if(current_config) {
         saveSimulation();
         saveEvolution();
         saveRobot();
+        ui->robotConfigTree->takeTopLevelItem(0);
     }
 
-    while(ui->tree_runs->topLevelItemCount() > 0) {
-        ui->tree_runs->takeTopLevelItem(0);
+    while(ui->tree_runs->count() > 0) {
+        ui->tree_runs->takeItem(0);
     }
 
     if(item_ == nullptr) {
@@ -817,9 +834,8 @@ void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
         loadEvolution();
         loadRobot();
         for(auto& run_item: current_config->run_list) {
-            ui->tree_runs->addTopLevelItem(run_item);
+            ui->tree_runs->addItem(run_item);
         }
-        ui->line_name->setText(current_config->text(0));
     }
 }
 
@@ -827,18 +843,19 @@ void MainWindow::onProjectTreeAdd()
 {
     ProjectConfiguration* project1_config = new ProjectConfiguration();
 
-    project1_config->setText(0, "New Configuration");
-    ui->tree_project->addTopLevelItem(project1_config);
+    project1_config->setText("New Configuration");
+    ui->tree_project->addItem(project1_config);
 }
 
 void MainWindow::onProjectTreeRemove()
 {
     ProjectConfiguration* item = dynamic_cast<ProjectConfiguration*>(ui->tree_project->currentItem());
     if(item != nullptr) {
+        if(item->root_directory != "") QDir(item->root_directory).removeRecursively();
         delete item;
     }
 
-    if(ui->tree_project->topLevelItemCount() < 1) {
+    if(ui->tree_project->count() < 1) {
         ui->tabWidget->setEnabled(false);
     }
 
@@ -874,15 +891,37 @@ void MainWindow::onItemChange(QTreeWidgetItem*, QTreeWidgetItem*)
     ui->spin_paramrotation->blockSignals(false);
 }
 
-void MainWindow::onRunSelect(QTreeWidgetItem *item_, int)
+void MainWindow::onRunSelect(QListWidgetItem* current)
 {
     ui->list_generations->clear();
-    if(item_ == nullptr) return;
-    QString run_directory = current_config->root_directory + "/" + item_->text(0);
+    if(!current) return;
+    RunTreeItem* item = dynamic_cast<RunTreeItem*>(current);
+
+    QString run_directory = current_config->root_directory + "/" + item->path;
     //qDebug() << "checking run directory: " << run_directory << endl;
     QDir dir(run_directory);
     QStringList list = dir.entryList({"GenerationBest-*.json"});
     ui->list_generations->addItems(list);
+}
+
+void MainWindow::onRunDeletePressed()
+{
+    if(!ui->tree_runs->currentItem()) return;
+    RunTreeItem* item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+    QDir(current_config->root_directory + "/" + item->path).removeRecursively();
+    current_config->run_list.removeOne(item);
+    delete ui->tree_runs->currentItem();
+    ui->list_generations->clear();
+}
+
+void MainWindow::onRunItemDoubleClicked(QListWidgetItem *item)
+{
+    item->setFlags(item->flags() |= Qt::ItemIsEditable);
+}
+
+void MainWindow::onProjectConfigDoubleClicked(QListWidgetItem *item)
+{
+    item->setFlags(item->flags() |= Qt::ItemIsEditable);
 }
 
 void MainWindow::onLoadRobot()
@@ -948,6 +987,7 @@ void MainWindow::loadRobotJson(const QString &filename)
     current_config->robot->root_part->update();
     loadRobot();
 }
+
 
 void MainWindow::writeEvolution()
 {
@@ -1281,7 +1321,7 @@ PART_TYPE MainWindow::typeFromString(const QString& str)
 void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
 {
     QString name;
-    QString type = RobotConfigForm::stringFromType(part->type);
+    QString type = MainWindow::stringFromType(part->type);
 
     for(int i = 0; i < tab; i++)
     {
@@ -1289,7 +1329,7 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     }
     name = part->name;
     if(name.isEmpty())
-        name = "PARTGEN_" + QString::number((ulong)part);
+        name = "PARTGEN_" + QString::number((ULONG64)part);
 
     stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
     if(part->type == PART_TYPE::PARAMETRIC_JOINT)
@@ -1365,3 +1405,4 @@ QString MainWindow::stringFromType(PART_TYPE tp)
     }
     return type;
 }
+

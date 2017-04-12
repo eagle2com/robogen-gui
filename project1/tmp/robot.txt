@@ -1,17 +1,1 @@
-0 CoreComponent Core 0
-	0 ActiveHinge Hip1 1
-		1 FixedBrick UpperLeg1 1
-			1 ActiveHinge Knee1 0
-				1 FixedBrick LowerLeg1 0
-	1 ActiveHinge Hip2 3
-		1 FixedBrick UpperLeg2 1
-			1 ActiveHinge Knee2 0
-				1 FixedBrick LowerLeg2 0
-	2 ActiveHinge Hip3 0
-		1 FixedBrick UpperLeg3 1
-			1 ActiveHinge Knee3 0
-				1 FixedBrick LowerLeg3 0
-	3 ActiveHinge Hip4 0
-		1 FixedBrick UpperLeg4 1
-			1 ActiveHinge Knee4 0
-				1 FixedBrick LowerLeg4 0
+0 CoreComponent ROOT 0

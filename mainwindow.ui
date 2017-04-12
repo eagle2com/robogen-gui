@@ -24,7 +24,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTreeWidget" name="tree_project">
+       <widget class="QListWidget" name="tree_project">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -52,43 +52,10 @@
         <property name="focusPolicy">
          <enum>Qt::ClickFocus</enum>
         </property>
-        <property name="animated">
-         <bool>false</bool>
-        </property>
-        <property name="expandsOnDoubleClick">
-         <bool>false</bool>
-        </property>
-        <property name="columnCount">
-         <number>1</number>
-        </property>
-        <column>
-         <property name="text">
-          <string>Configurations</string>
-         </property>
-        </column>
        </widget>
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="1">
-         <widget class="QProgressBar" name="progressBar">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-          <property name="format">
-           <string>%v/%m</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QPushButton" name="push_evolve">
           <property name="text">
@@ -102,7 +69,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset>
             <normaloff>:/imgs/minus</normaloff>:/imgs/minus</iconset>
           </property>
          </widget>
@@ -114,20 +81,13 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="push_simulate">
-          <property name="text">
-           <string>Simulate</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QPushButton" name="push_add">
           <property name="text">
            <string/>
           </property>
           <property name="icon">
-           <iconset resource="res.qrc">
+           <iconset>
             <normaloff>:/imgs/plus</normaloff>:/imgs/plus</iconset>
           </property>
          </widget>
@@ -155,6 +115,25 @@
           </property>
          </widget>
         </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QProgressBar" name="progressBar">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="format">
+           <string>%v/%m</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -169,24 +148,6 @@
         <string>Overview</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="1" column="2">
-         <widget class="QTreeWidget" name="tree_runs">
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-          <property name="itemsExpandable">
-           <bool>false</bool>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
-          <column>
-           <property name="text">
-            <string>Runs</string>
-           </property>
-          </column>
-         </widget>
-        </item>
         <item row="1" column="4">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -197,7 +158,11 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="line_name"/>
+           <widget class="QPushButton" name="push_simulate">
+            <property name="text">
+             <string>Simulate</string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer">
@@ -216,6 +181,13 @@
         </item>
         <item row="1" column="3">
          <widget class="QListWidget" name="list_generations">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="CustomListWidget" name="tree_runs">
           <property name="alternatingRowColors">
            <bool>true</bool>
           </property>
@@ -1400,9 +1372,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <customwidgets>
+  <customwidget>
+   <class>CustomListWidget</class>
+   <extends>QListWidget</extends>
+   <header>customlistwidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
  <connections>
   <connection>
    <sender>actionQuit</sender>
