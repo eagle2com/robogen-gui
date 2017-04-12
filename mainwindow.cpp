@@ -305,9 +305,6 @@ void MainWindow::onFileChanged(QString filename)
         if(list.size() > 0) {
             qDebug() << "generation " << list.size() << " done" << endl;
             ui->progressBar->setValue(list.size());
-            if(current_config == current_running_config) {
-
-            }
         }
     }
 
@@ -403,6 +400,7 @@ void MainWindow::onOpenProject()
 
         QJsonObject simulation_obj = config["simulation"].toObject();
         QJsonObject evolution_obj = config["evolution"].toObject();
+        QJsonArray run_array = config["run_list"].toArray();
 
         for(const QString& key: simulation_obj.keys()) {
             if(key.startsWith("combo")) {
@@ -428,15 +426,23 @@ void MainWindow::onOpenProject()
             }
         }
 
+        for(auto& run_item: run_array) {
+            RunTreeItem* new_run_item = new RunTreeItem();
+            new_run_item->setText(0, run_item.toString());
+            project1_config->run_list.append(new_run_item);
+        }
+
         QJsonObject robot_obj = config["robot"].toObject();
         project1_config->robot->loadRobotFromObject(robot_obj);
     }
 
-    current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
+    //current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
 
     //overview_form->project_path = project_directory;
 
-    ui->tree_project->setCurrentItem(ui->tree_project->topLevelItem(0));
+    //ui->tree_project->setCurrentItem(ui->tree_project->topLevelItem(0));
+
+    ui->tabWidget->setEnabled(false);
 }
 
 bool MainWindow::onSaveProject()
@@ -453,6 +459,10 @@ bool MainWindow::onSaveProject()
         return false;
     }
 
+    saveEvolution();
+    saveSimulation();
+    saveRobot();
+
     QJsonDocument doc;
     QJsonObject main_object;
 
@@ -463,6 +473,8 @@ bool MainWindow::onSaveProject()
         ProjectConfiguration* config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(i));
         QJsonObject config_obj;
         QJsonObject evolution_obj;
+        QJsonArray run_array;
+
         for(auto& pair: config->evolution->combo_map) {
             evolution_obj[pair.first] = pair.second;
         }
@@ -489,10 +501,15 @@ bool MainWindow::onSaveProject()
             simulation_obj[pair.first] = pair.second;
         }
 
+        for(auto& run_item: config->run_list) {
+            run_array.push_back(run_item->text(0));
+        }
+
         config_obj["simulation"] = simulation_obj;
         config_obj["name"] = config->text(0);
         config_obj["robot"] = config->robot->get_json();
         config_obj["root_directory"] = config->root_directory;
+        config_obj["run_list"] = run_array;
         config_array.push_back(config_obj);
     }
 
@@ -530,7 +547,12 @@ void MainWindow::onEvolve()
     }
 
     if(settings_window->get_robogen_directory() == "") {
-        QMessageBox::critical(this, "Error", "Please set the path to the robogen \"build\" folder in File->settings");
+        QMessageBox::critical(this, "Error", "Please set the path to the robogen \"build\" or \"run\" folder in File->settings");
+        return;
+    }
+
+    if(!current_config) {
+        QMessageBox::critical(this, "Error", "Please select a configuration from the list that you want to evolve.");
         return;
     }
 
@@ -550,8 +572,18 @@ void MainWindow::onEvolve()
     }
 
     // Create run output directory
-    current_run_path = current_running_config->root_directory + "/run_" + QString::number(time(0));
+    QString run_name = "run_" + QString::number(time(0));
+    current_run_path = current_running_config->root_directory + "/" + run_name;
     qDebug() << "current run path: " << current_run_path;
+
+    RunTreeItem* run_item = new RunTreeItem();
+    run_item->setText(0, run_name);
+    current_running_config->run_list.append(run_item);
+    if(current_config == current_running_config) {
+        ui->tree_runs->addTopLevelItem(run_item);
+    }
+
+    //ui->tree_runs->addTopLevelItem();
 
     ui->push_evolve->setDisabled(true);
     ui->push_stop->setEnabled(true);
@@ -568,7 +600,7 @@ void MainWindow::onEvolve()
             arguments.clear();
             arguments << QString::number(8000 + i + 1);
             QProcess *process = new QProcess(this);
-            process->setProcessChannelMode(QProcess::ForwardedChannels);
+            process->setProcessChannelMode(QProcess::ForwardedErrorChannel);
             process->start(program, arguments);
             process_list.push_back(process);
 
@@ -630,6 +662,7 @@ void MainWindow::onEvolutionComboChanged(QString)
 void MainWindow::saveSimulation()
 {
     if(current_config) {
+        //qDebug() << "saveSimulation" << endl;
         for(QComboBox *child: ui->tab_simulation->findChildren<QComboBox*>()) {
             current_config->simulation->combo_map[child->objectName()] = child->currentText();
         }
@@ -651,6 +684,7 @@ void MainWindow::saveSimulation()
 void MainWindow::loadSimulation()
 {
     if(current_config) {
+        //qDebug() << "loadSimulation" << endl;
         for(auto& pair: current_config->simulation->combo_map) {
             QComboBox* child = ui->tab_simulation->findChild<QComboBox*>(pair.first);
             child->setCurrentText(pair.second);
@@ -676,6 +710,7 @@ void MainWindow::loadSimulation()
 void MainWindow::saveEvolution()
 {
     if(current_config) {
+        //qDebug() << "saveEvolution" << endl;
         for(QComboBox *child: ui->tab_evolution->findChildren<QComboBox*>()) {
             current_config->evolution->combo_map[child->objectName()] = child->currentText();
         }
@@ -697,6 +732,7 @@ void MainWindow::saveEvolution()
 void MainWindow::loadEvolution()
 {
     if(current_config) {
+        //qDebug() << "loadEvolution" << endl;
         for(auto& pair: current_config->evolution->combo_map) {
             QComboBox* child = ui->tab_evolution->findChild<QComboBox*>(pair.first);
             child->setCurrentText(pair.second);
@@ -722,13 +758,15 @@ void MainWindow::loadEvolution()
 void MainWindow::saveRobot()
 {
     if(current_config) {
-        ui->robotConfigTree->takeTopLevelItem(0);
+        //qDebug() << "saveRobot" << endl;
+        //ui->robotConfigTree->takeTopLevelItem(0);
     }
 }
 
 void MainWindow::loadRobot()
 {
     if(current_config) {
+        //qDebug() << "loadRobot" << endl;
         ui->robotConfigTree->addTopLevelItem(current_config->robot->root_part);
     }
 }
@@ -749,6 +787,10 @@ void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
         saveRobot();
     }
 
+    while(ui->tree_runs->topLevelItemCount() > 0) {
+        ui->tree_runs->takeTopLevelItem(0);
+    }
+
     if(item_ == nullptr) {
         ui->tabWidget->setEnabled(false);
     } else {
@@ -760,6 +802,9 @@ void MainWindow::onProjectTreeSelect(QTreeWidgetItem *item_, int)
         loadSimulation();
         loadEvolution();
         loadRobot();
+        for(auto& run_item: current_config->run_list) {
+            ui->tree_runs->addTopLevelItem(run_item);
+        }
         ui->line_name->setText(current_config->text(0));
     }
 }

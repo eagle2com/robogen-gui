@@ -10,9 +10,6 @@
 
 #include "robotconfigform.h"
 
-ItemClass ProjectConfiguration::getType() {
-    return ItemClass::PROJECT;
-}
 
 ProjectConfiguration::ProjectConfiguration(QObject *parent)
 {
@@ -21,9 +18,6 @@ ProjectConfiguration::ProjectConfiguration(QObject *parent)
     evolution = new EvolutionConfiguration();
 }
 
-ItemClass RobotConfiguration::getType() {
-    return ItemClass::ROBOT;
-}
 
 RobotConfiguration::RobotConfiguration(QObject *parent)
 {
@@ -52,6 +46,7 @@ QJsonObject RobotConfiguration::get_json()
         RobotPart* part = dynamic_cast<RobotPart*>(*it);
         QJsonObject part_obj;
 
+        if(part->name.isEmpty()) part->name = "PARTGEN_" + QString::number((ulong)part);
         part_obj["id"] = part->name;
         part_obj["type"] = RobotConfigForm::stringFromType(part->type); //TODO move this elsewhere
         part_obj["root"] = part->parent() == nullptr? true:false;
@@ -75,6 +70,8 @@ QJsonObject RobotConfiguration::get_json()
     obj["body"] = body_obj;
 
     tmp_tree.takeTopLevelItem(0);
+
+    root_part->update();
 
     return obj;
 }
@@ -221,6 +218,9 @@ bool RobotConfiguration::loadRobotJson(const QString &filename, QWidget* parent)
         RobotPart *parent = hash[connection.toObject()["src"].toString()];
         RobotPart *child = hash[connection.toObject()["dest"].toString()];
         child->face = (PART_FACE)connection.toObject()["srcSlot"].toInt();
+        // FIXME Check srcSlot destSlot combinations
+        if(child->face == PART_FACE::BACK) child->face = PART_FACE::FRONT;
+        else if(child->face == PART_FACE::FRONT) child->face = PART_FACE::BACK;
         parent->addChild(child);
         child->update();
     }
@@ -267,18 +267,12 @@ bool RobotConfiguration::loadRobotFromObject(const QJsonObject &obj)
     return true;
 }
 
-ItemClass SimulationConfiguration::getType() {
-    return ItemClass::SIMULATION;
-}
 
 SimulationConfiguration::SimulationConfiguration(QObject *parent)
 {
 
 }
 
-ItemClass EvolutionConfiguration::getType() {
-    return ItemClass::EVOLUTION;
-}
 
 EvolutionConfiguration::EvolutionConfiguration(QObject *parent)
 {

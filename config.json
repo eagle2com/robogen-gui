@@ -1,4 +1,5 @@
 {
 	"__comment:" : "Set the path to the robogen build folder on the next line",
-    "build-path" : "E:/apps/robogen-windows/run"
+    "build-path-old" : "E:/apps/robogen-windows/run",
+    "build-path" : ""
 }

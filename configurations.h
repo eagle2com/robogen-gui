@@ -108,19 +108,18 @@ public:
     }
 };
 
-enum class ItemClass {
-    ROBOT, SIMULATION, EVOLUTION, PROJECT
+class GenerationTreeItem: public QTreeWidgetItem {
+public:
 };
 
-class ConfigurationItem: public QTreeWidgetItem {
+class RunTreeItem: public QTreeWidgetItem {
 public:
-    virtual ItemClass getType() = 0;
+    QList<GenerationTreeItem*> generations;
 };
 
 
 class RobotConfiguration {
 public:
-    virtual ItemClass getType();
     RobotConfiguration(QObject* parent = nullptr);
 
     RobotPart* root_part = nullptr;
@@ -133,7 +132,6 @@ public:
 
 class SimulationConfiguration {
  public:
-    virtual ItemClass getType();
     SimulationConfiguration(QObject* parent = nullptr);
 
     std::map<QString, QString> combo_map;
@@ -144,7 +142,6 @@ class SimulationConfiguration {
 
 class EvolutionConfiguration {
 public:
-    virtual ItemClass getType();
     EvolutionConfiguration(QObject* parent = nullptr);
 
     std::map<QString, QString> combo_map;
@@ -154,15 +151,14 @@ public:
 };
 
 
-class ProjectConfiguration: public ConfigurationItem {
+class ProjectConfiguration: public QTreeWidgetItem {
 public:
-    virtual ItemClass getType();
     ProjectConfiguration(QObject* parent = nullptr);
     RobotConfiguration* robot = nullptr;
     SimulationConfiguration* simulation = nullptr;
     EvolutionConfiguration* evolution = nullptr;
     QString root_directory = "";
-    QStringList run_directories;
+    QList<RunTreeItem*> run_list;
 };
 
 
