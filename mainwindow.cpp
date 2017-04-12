@@ -423,6 +423,7 @@ void MainWindow::onOpenProject()
         ProjectConfiguration* project1_config = new ProjectConfiguration();
         project1_config->setText(config["name"].toString());
         project1_config->root_directory = config["root_directory"].toString();
+        project1_config->setToolTip(project1_config->root_directory);
         qDebug() << "found root_directory: " << project1_config->root_directory;
         ui->tree_project->addItem(project1_config);
 
@@ -459,6 +460,7 @@ void MainWindow::onOpenProject()
             RunTreeItem* new_run_item = new RunTreeItem();
             new_run_item->setText(run_obj["name"].toString());
             new_run_item->path = run_obj["path"].toString();
+            new_run_item->setToolTip(new_run_item->path);
             project1_config->run_list.append(new_run_item);
         }
 
@@ -595,7 +597,8 @@ void MainWindow::onEvolve()
 
     current_running_config = current_config;
     if(current_running_config->root_directory == "") {
-        current_running_config->root_directory = project_directory + "/runs/config_" + QString::number(time(0));
+        current_running_config->root_directory = project_directory + "/runs/config_" + QDateTime::currentDateTime().toString("yy_MM_dd__hh_mm_ss__") +  QString::number(ui->tree_runs->count());
+        current_running_config->setToolTip(current_running_config->root_directory);
     }
 
     // Create config output directory if it does not exist yet
@@ -605,19 +608,18 @@ void MainWindow::onEvolve()
     }
 
     // Create run output directory
-    current_run_name = "run_" + QString::number(time(0));
+    current_run_name = "run_" + QDateTime::currentDateTime().toString("yy_MM_dd__hh_mm_ss__") +  QString::number(ui->tree_runs->count());
     current_run_path = current_running_config->root_directory + "/" + current_run_name;
     qDebug() << "current run path: " << current_run_path;
 
     RunTreeItem* run_item = new RunTreeItem();
     run_item->setText(current_run_name);
     run_item->path = current_run_name;
+    run_item->setToolTip(run_item->path);
     current_running_config->run_list.append(run_item);
     if(current_config == current_running_config) {
         ui->tree_runs->addItem(run_item);
     }
-
-    //ui->tree_runs->addTopLevelItem();
 
 
 
@@ -811,11 +813,11 @@ void MainWindow::closeEvent(QCloseEvent *ev)
 
 void MainWindow::onProjectTreeSelect(QListWidgetItem *item_)
 {
+    ui->robotConfigTree->takeTopLevelItem(0);
     if(current_config) {
         saveSimulation();
         saveEvolution();
         saveRobot();
-        ui->robotConfigTree->takeTopLevelItem(0);
     }
 
     while(ui->tree_runs->count() > 0) {
@@ -854,10 +856,8 @@ void MainWindow::onProjectTreeRemove()
         if(item->root_directory != "") QDir(item->root_directory).removeRecursively();
         delete item;
     }
-
-    if(ui->tree_project->count() < 1) {
-        ui->tabWidget->setEnabled(false);
-    }
+    ui->tree_project->setCurrentItem(nullptr);
+    ui->tabWidget->setEnabled(false);
 
     current_config = nullptr;
 }

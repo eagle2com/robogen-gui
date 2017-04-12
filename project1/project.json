@@ -23,7 +23,7 @@
                 "spin_seed": 0,
                 "spin_tournament": 2
             },
-            "name": "test1",
+            "name": "config 1",
             "robot": {
                 "body": {
                     "connection": [
@@ -38,12 +38,8 @@
                     ]
                 }
             },
-            "root_directory": "E:/dev/robogen-gui/project1/runs/config_1492033424",
+            "root_directory": "E:/dev/robogen-gui/project1/runs/config_17_04_13__00_04_08__0",
             "run_list": [
-                {
-                    "name": "run_1492033424",
-                    "path": "run_1492033424"
-                }
             ],
             "simulation": {
                 "combo_scenario": "racing",
