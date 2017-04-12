@@ -69,7 +69,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="res.qrc">
             <normaloff>:/imgs/minus</normaloff>:/imgs/minus</iconset>
           </property>
          </widget>
@@ -87,7 +87,7 @@
            <string/>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="res.qrc">
             <normaloff>:/imgs/plus</normaloff>:/imgs/plus</iconset>
           </property>
          </widget>
@@ -1243,7 +1243,14 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionTutorial"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionEvolve">
@@ -1370,6 +1377,11 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionTutorial">
+   <property name="text">
+    <string>Tutorial</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -1379,7 +1391,9 @@
    <header>customlistwidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionQuit</sender>
