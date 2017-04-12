@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QStringList>
 #include <qcustomplot.h>
 
 #include <stdio.h>
@@ -61,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // ========================== OVERVIEW TAB SETUP ===================================
     connect(ui->line_name, SIGNAL(editingFinished()), this, SLOT(onOverviewNameEditFinished()));
+    connect(ui->tree_runs, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onRunSelect(QTreeWidgetItem*,int)));
+    connect(ui->push_simulate, SIGNAL(clicked(bool)), this, SLOT(onPushSimulate()));
+    connect(ui->push_analyze, SIGNAL(clicked(bool)), this, SLOT(onPushAnalyze()));
 
     // ========================== EVOLUTION TAB SETUP =================================
 
@@ -169,27 +173,31 @@ void MainWindow::loadSimulation()
 
 void MainWindow::onPushSimulate()
 {
-    /*
-    QString program = ui->edit_robogenpath->text() + "/robogen-file-viewer";
+    QString program = settings_window->get_robogen_directory() + "/robogen-file-viewer";
     QStringList arguments;
-    QListWidgetItem *current = ui->list_generationsbest->currentItem();
-    if(current)
-    {
-        QString path = ui->line_evolve->text() + "/" + current->text();
-        arguments << path << project_path + "/sim.txt";
-        process_simulate = new QProcess(this);
-        process_simulate->setWorkingDirectory(ui->edit_robogenpath->text());
-        process_simulate->start(program, arguments);
-    }
-    */
+
+    if(!ui->tree_runs->currentItem()) return;
+    if(!ui->list_generations->currentItem()) return;
+    RunTreeItem* run_item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+    QString generation_path = current_config->root_directory + "/" + run_item->text(0) + "/"+ ui->list_generations->currentItem()->text();
+
+    arguments << generation_path << current_config->root_directory + "/" + run_item->text(0) + "/sim.txt";
+    process_simulate = new QProcess(this);
+    process_simulate->setWorkingDirectory(settings_window->get_robogen_directory());
+    process_simulate->start(program, arguments);
 }
 
 void MainWindow::onPushAnalyze()
 {
-    /*
-    QString path = ui->line_evolve->text() + "/BestAvgStd.txt";
+    if(!current_config) return;
+    if(!ui->tree_runs->currentItem()) return;
+    QString path = current_config->root_directory + "/" + ui->tree_runs->currentItem()->text(0) + "/BestAvgStd.txt";
+
     QFile file(path);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        return;
+    }
 
     QTextStream in(&file);
 
@@ -275,7 +283,6 @@ void MainWindow::onPushAnalyze()
     customPlot->show();
 
     qDebug() << "PLOTTING" << v_best.length();
-    */
 }
 
 void MainWindow::onPushStop()
@@ -305,6 +312,18 @@ void MainWindow::onFileChanged(QString filename)
         if(list.size() > 0) {
             qDebug() << "generation " << list.size() << " done" << endl;
             ui->progressBar->setValue(list.size());
+        }
+
+        if(current_config == current_running_config){
+            // If the current run is selected in the run list, update the generations list
+            if(ui->tree_runs->currentItem() && ui->tree_runs->currentItem()->text(0) == current_run_name) {
+                for(auto& gen_item: list) {
+                    // If the item is not yet in the generation list, add it
+                    if(ui->list_generations->findItems(gen_item, Qt::MatchExactly).empty()) {
+                        ui->list_generations->addItem(gen_item);
+                    }
+                }
+            }
         }
     }
 
@@ -572,12 +591,12 @@ void MainWindow::onEvolve()
     }
 
     // Create run output directory
-    QString run_name = "run_" + QString::number(time(0));
-    current_run_path = current_running_config->root_directory + "/" + run_name;
+    current_run_name = "run_" + QString::number(time(0));
+    current_run_path = current_running_config->root_directory + "/" + current_run_name;
     qDebug() << "current run path: " << current_run_path;
 
     RunTreeItem* run_item = new RunTreeItem();
-    run_item->setText(0, run_name);
+    run_item->setText(0, current_run_name);
     current_running_config->run_list.append(run_item);
     if(current_config == current_running_config) {
         ui->tree_runs->addTopLevelItem(run_item);
@@ -652,11 +671,6 @@ void MainWindow::onOverviewNameEditFinished()
     if(current_config) {
         current_config->setText(0, ui->line_name->text());
     }
-}
-
-void MainWindow::onEvolutionComboChanged(QString)
-{
-
 }
 
 void MainWindow::saveSimulation()
@@ -858,6 +872,17 @@ void MainWindow::onItemChange(QTreeWidgetItem*, QTreeWidgetItem*)
     ui->robotPartNameEdit->blockSignals(false);
     ui->spin_paramlength->blockSignals(false);
     ui->spin_paramrotation->blockSignals(false);
+}
+
+void MainWindow::onRunSelect(QTreeWidgetItem *item_, int)
+{
+    ui->list_generations->clear();
+    if(item_ == nullptr) return;
+    QString run_directory = current_config->root_directory + "/" + item_->text(0);
+    //qDebug() << "checking run directory: " << run_directory << endl;
+    QDir dir(run_directory);
+    QStringList list = dir.entryList({"GenerationBest-*.json"});
+    ui->list_generations->addItems(list);
 }
 
 void MainWindow::onLoadRobot()

@@ -65,7 +65,6 @@ public slots:
     void onEvolve();
 
     void onOverviewNameEditFinished();
-    void onEvolutionComboChanged(QString);
 
     void saveSimulation();
     void loadSimulation();
@@ -87,6 +86,8 @@ private slots:
     void onRobotParamLengthChange(double value);
     void onRobotParamRotationChange(int value);
     void onItemChange(QTreeWidgetItem *, QTreeWidgetItem *);
+
+    void onRunSelect(QTreeWidgetItem*item_, int);
 
     void onLoadRobot();
     void loadRobotJson(const QString& filename);
@@ -112,6 +113,8 @@ private:
 
     ProjectConfiguration* current_config = nullptr;
     ProjectConfiguration* current_running_config = nullptr;
+
+    QString current_run_name = "";
     QString current_run_path = "";
 
     void writeEvolution();
