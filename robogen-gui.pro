@@ -11,23 +11,38 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 TARGET = robogen-gui
 TEMPLATE = app
 
-!win32 {
-    QMAKE_CXXFLAGS += -std=c++11
-}
-
 SOURCES += main.cpp\
         mainwindow.cpp \
     qcustomplot.cpp \
-    dirwatcher.cpp
+    dirwatcher.cpp \
+    evolutionconfigform.cpp \
+    simulationconfigform.cpp \
+    robotconfigform.cpp \
+    configoverviewform.cpp \
+    settingswindow.cpp \
+    configurations.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
-    dirwatcher.h
+    dirwatcher.h \
+    evolutionconfigform.h \
+    simulationconfigform.h \
+    robotconfigform.h \
+    configoverviewform.h \
+    settingswindow.h \
+    configurations.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    testwindow.ui \
+    evolutionconfigform.ui \
+    simulationconfigform.ui \
+    robotconfigform.ui \
+    configoverviewform.ui \
+    settingswindow.ui
 
 RESOURCES += \
     res.qrc
 
 DISTFILES += \
-    TODO
+    TODO \
+    test.py
