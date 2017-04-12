@@ -416,38 +416,6 @@ PART_TYPE RobotConfigForm::typeFromString(const QString& str)
 }
 
 
-void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
-{
-    QString name;
-    QString type = RobotConfigForm::stringFromType(part->type);
-
-    for(int i = 0; i < tab; i++)
-    {
-        stream << "\t";
-    }
-    name = part->name;
-    if(name.isEmpty())
-        name = "PARTGEN_" + QString::number((ulong)part);
-
-    stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
-    if(part->type == PART_TYPE::PARAMETRIC_JOINT)
-    {
-        // The last param is the inclination, which is disabled for now and force to 0
-        stream << " " << part->param_length << " " << part->param_rotation <<" 0";
-    }
-    //FIXME Dirty hack
-    if(part->type == PART_TYPE::ACTIVE_WHEEL || part->type == PART_TYPE::PASSIVE_WHEEL)
-    {
-        // radius?
-        stream << " " << 0.04;
-    }
-    stream << endl;
-
-    for(int i = 0; i < part->childCount(); i++)
-    {
-        writeRobotPart(dynamic_cast<RobotPart*>(part->child(i)), tab+1,stream);
-    }
-}
 
 void RobotConfigForm::writeRobot(const QString &project_path)
 {
@@ -457,7 +425,7 @@ void RobotConfigForm::writeRobot(const QString &project_path)
     if ( file.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text) )
     {
         QTextStream stream( &file );
-        writeRobotPart(current_config->root_part, 0, stream);
+       // writeRobotPart(current_config->root_part, 0, stream);
         //FIXME Dirty hack
         //stream << "\n\n\nLeftWheel 0 100" << endl;
         //stream << "RightWheel 0 -100" << endl;

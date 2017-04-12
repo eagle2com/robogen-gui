@@ -118,7 +118,7 @@ public:
 };
 
 
-class RobotConfiguration: public ConfigurationItem {
+class RobotConfiguration {
 public:
     virtual ItemClass getType();
     RobotConfiguration(QObject* parent = nullptr);
@@ -131,7 +131,7 @@ public:
     bool loadRobotFromObject(const QJsonObject& obj);
 };
 
-class SimulationConfiguration: public ConfigurationItem {
+class SimulationConfiguration {
  public:
     virtual ItemClass getType();
     SimulationConfiguration(QObject* parent = nullptr);
@@ -142,7 +142,7 @@ class SimulationConfiguration: public ConfigurationItem {
     std::map<QString, bool> bool_map;
 };
 
-class EvolutionConfiguration: public ConfigurationItem {
+class EvolutionConfiguration {
 public:
     virtual ItemClass getType();
     EvolutionConfiguration(QObject* parent = nullptr);

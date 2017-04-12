@@ -34,13 +34,18 @@ public:
     QString project_directory = "";
     QString getRobogenPath();
 
+    static QString stringFromType(PART_TYPE tp);
+    static PART_TYPE typeFromString(const QString& str);
+    QJsonObject getRobotJsonObject();
+    QJsonObject getPartJsonObject(RobotPart* part);
+
 public slots:
     void onProjectTreeSelect(QTreeWidgetItem*,int);
     void onProjectTreeAdd();
     void onProjectTreeRemove();
 
-    void loadSimulation();
-    void loadEvolution();
+    //void loadSimulation();
+    //void loadEvolution();
 
     void onPushSimulate();
     void onPushAnalyze();
@@ -59,6 +64,33 @@ public slots:
 
     void onEvolve();
 
+    void onOverviewNameEditFinished();
+    void onEvolutionComboChanged(QString);
+
+    void saveSimulation();
+    void loadSimulation();
+
+    void saveEvolution();
+    void loadEvolution();
+
+    void saveRobot();
+    void loadRobot();
+
+private slots:
+
+    void onAddPart();
+    void onRemovePart();
+    void onRobotPartChange(int index);
+    void onRobotFaceChange(int index);
+    void onRobotPartNameChange(QString name);
+    void onRobotRotationChange(int index);
+    void onRobotParamLengthChange(double value);
+    void onRobotParamRotationChange(int value);
+    void onItemChange(QTreeWidgetItem *, QTreeWidgetItem *);
+
+    void onLoadRobot();
+    void loadRobotJson(const QString& filename);
+
 private:
     Ui::MainWindow *ui;
 
@@ -76,15 +108,15 @@ private:
     QList<QProcess*> process_list;
     DirWatcher dir_watcher;
 
-    SimulationConfigForm *simulation_config_form = nullptr;
-    EvolutionConfigForm* evolution_config_form = nullptr;
-    RobotConfigForm* robot_config_form = nullptr;
-    ConfigOverviewForm* overview_form = nullptr;
     SettingsWindow* settings_window = nullptr;
 
     ProjectConfiguration* current_config = nullptr;
     ProjectConfiguration* current_running_config = nullptr;
     QString current_run_path = "";
+
+    void writeEvolution();
+    void writeSimulation();
+    void writeRobot();
 
     void closeEvent(QCloseEvent* ev);
 };

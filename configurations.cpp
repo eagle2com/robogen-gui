@@ -19,10 +19,6 @@ ProjectConfiguration::ProjectConfiguration(QObject *parent)
     robot = new RobotConfiguration();
     simulation = new SimulationConfiguration();
     evolution = new EvolutionConfiguration();
-
-    this->addChild(robot);
-    this->addChild(simulation);
-    this->addChild(evolution);
 }
 
 ItemClass RobotConfiguration::getType() {
@@ -31,11 +27,9 @@ ItemClass RobotConfiguration::getType() {
 
 RobotConfiguration::RobotConfiguration(QObject *parent)
 {
-    setText(0, "Robot");
     root_part = new RobotPart();
     root_part->type = PART_TYPE::CORE_COMPONENT;
     root_part->name = "ROOT";
-
 }
 
 QJsonObject RobotConfiguration::get_json()
@@ -279,7 +273,7 @@ ItemClass SimulationConfiguration::getType() {
 
 SimulationConfiguration::SimulationConfiguration(QObject *parent)
 {
-    setText(0, "Simulation");
+
 }
 
 ItemClass EvolutionConfiguration::getType() {
@@ -288,5 +282,5 @@ ItemClass EvolutionConfiguration::getType() {
 
 EvolutionConfiguration::EvolutionConfiguration(QObject *parent)
 {
-    setText(0, "Evolution");
+
 }
