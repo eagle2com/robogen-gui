@@ -1,1 +1,6 @@
-- use QCustomPlot for some generations plotting (fitness, mean, std?)
+TODO
+- Custom js scenario
+
+DONE
+- Custom config files
+- Prevent deleting currently running configuration

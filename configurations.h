@@ -125,6 +125,8 @@ public:
     bool loadRobot(const QString& filename = "");
     bool loadRobotJson(const QString& filename, QWidget *parent = nullptr);
     bool loadRobotFromObject(const QJsonObject& obj);
+    std::map<QString, QString> text_map;
+    std::map<QString, bool> bool_map;
 };
 
 class SimulationConfiguration {
@@ -135,6 +137,7 @@ class SimulationConfiguration {
     std::map<QString, int> spin_map;
     std::map<QString, double> double_spin_map;
     std::map<QString, bool> bool_map;
+    std::map<QString, QString> text_map;
 };
 
 class EvolutionConfiguration {
@@ -145,6 +148,7 @@ public:
     std::map<QString, int> spin_map;
     std::map<QString, double> double_spin_map;
     std::map<QString, bool> bool_map;
+    std::map<QString, QString> text_map;
 };
 
 

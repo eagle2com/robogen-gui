@@ -141,7 +141,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_overview">
        <attribute name="title">
@@ -701,6 +701,16 @@
              </property>
             </spacer>
            </item>
+           <item row="11" column="6">
+            <widget class="QLineEdit" name="line_custom_evolution"/>
+           </item>
+           <item row="11" column="5">
+            <widget class="QCheckBox" name="check_custom_evolution">
+             <property name="text">
+              <string>Custom File</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -738,12 +748,12 @@
             </widget>
            </item>
            <item row="0" column="3">
-            <widget class="QCheckBox" name="check_customscenario">
+            <widget class="QCheckBox" name="check_custom_scenario">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
-              <string>Use Custom</string>
+              <string>Use Custom Scenario</string>
              </property>
             </widget>
            </item>
@@ -757,11 +767,6 @@
              <item>
               <property name="text">
                <string>chasing</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>obstacle_avoidance</string>
               </property>
              </item>
             </widget>
@@ -902,13 +907,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="4">
-            <widget class="QLineEdit" name="line_scenario">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
            <item row="7" column="0">
             <widget class="QLabel" name="label_36">
              <property name="text">
@@ -923,16 +921,6 @@
              </property>
              <property name="value">
               <double>25.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="5">
-            <widget class="QPushButton" name="push_browsescenario">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Browse</string>
              </property>
             </widget>
            </item>
@@ -976,6 +964,23 @@
              </property>
             </spacer>
            </item>
+           <item row="1" column="3">
+            <widget class="QCheckBox" name="check_custom_simulation">
+             <property name="text">
+              <string>Custom File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_simulation"/>
+           </item>
+           <item row="0" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_scenario">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -1010,33 +1015,7 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="0" column="0" colspan="3">
-               <widget class="QFrame" name="frame_2">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
-                </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
-                 <item>
-                  <widget class="QPushButton" name="button_add_part">
-                   <property name="text">
-                    <string>Add Part</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="button_remove_part">
-                   <property name="text">
-                    <string>Remove Part</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="5" column="0" colspan="2">
+              <item row="4" column="0" colspan="2">
                <widget class="QFrame" name="frame_6">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
@@ -1078,25 +1057,31 @@
                 </layout>
                </widget>
               </item>
-              <item row="2" column="0" colspan="3">
-               <widget class="QLineEdit" name="robotPartNameEdit">
-                <property name="placeholderText">
-                 <string>Part Name</string>
+              <item row="0" column="0" colspan="3">
+               <widget class="QFrame" name="frame_2">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
                 </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QPushButton" name="button_add_part">
+                   <property name="text">
+                    <string>Add Part</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="button_remove_part">
+                   <property name="text">
+                    <string>Remove Part</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
-              </item>
-              <item row="6" column="1">
-               <spacer name="verticalSpacer_4">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
               <item row="1" column="0" colspan="3">
                <widget class="QFrame" name="frame_3">
@@ -1173,6 +1158,26 @@
                 </layout>
                </widget>
               </item>
+              <item row="2" column="0" colspan="3">
+               <widget class="QLineEdit" name="robotPartNameEdit">
+                <property name="placeholderText">
+                 <string>Part Name</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item row="3" column="0">
                <widget class="QLabel" name="label_19">
                 <property name="text">
@@ -1187,6 +1192,16 @@
                 </property>
                 <property name="text">
                  <string>Load</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLineEdit" name="line_custom_robot"/>
+              </item>
+              <item row="5" column="1">
+               <widget class="QCheckBox" name="check_custom_robot">
+                <property name="text">
+                 <string>Custom File</string>
                 </property>
                </widget>
               </item>

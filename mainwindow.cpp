@@ -407,6 +407,7 @@ void MainWindow::onEvolveFinished(int s)
     qDebug() << "evolve finished: " << s << endl;
     delete fs_watcher; fs_watcher = nullptr;
 
+    current_running_config = nullptr;
     ui->push_stop->setEnabled(false);
     ui->push_evolve->setEnabled(true);
 }
@@ -421,6 +422,7 @@ void MainWindow::onNewProject()
     ui->tree_project->clear();
     ui->tabWidget->setEnabled(false);
     current_config = nullptr;
+    project_directory = "";
    // onProjectTreeAdd();
    // current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
    // ui->tree_project->setCurrentItem(ui->tree_project->topLevelItem(0));
@@ -457,6 +459,7 @@ void MainWindow::onOpenProject()
 
         QJsonObject simulation_obj = config["simulation"].toObject();
         QJsonObject evolution_obj = config["evolution"].toObject();
+        QJsonObject robot_obj = config["robot"].toObject();
         QJsonArray run_array = config["run_list"].toArray();
 
         for(const QString& key: simulation_obj.keys()) {
@@ -468,6 +471,12 @@ void MainWindow::onOpenProject()
             }
             else if(key.startsWith("dspin")) {
                 project1_config->simulation->double_spin_map[key] = simulation_obj.value(key).toDouble();
+            }
+            else if(key.startsWith("check")) {
+                project1_config->simulation->bool_map[key] = simulation_obj.value(key).toBool();
+            }
+            else if(key.startsWith("line")) {
+                project1_config->simulation->text_map[key] = simulation_obj.value(key).toString();
             }
         }
 
@@ -481,6 +490,12 @@ void MainWindow::onOpenProject()
             else if(key.startsWith("dspin")) {
                 project1_config->evolution->double_spin_map[key] = evolution_obj.value(key).toDouble();
             }
+            else if(key.startsWith("check")) {
+                project1_config->evolution->bool_map[key] = evolution_obj.value(key).toBool();
+            }
+            else if(key.startsWith("line")) {
+                project1_config->evolution->text_map[key] = evolution_obj.value(key).toString();
+            }
         }
 
         for(auto& run_item: run_array) {
@@ -492,8 +507,27 @@ void MainWindow::onOpenProject()
             project1_config->run_list.append(new_run_item);
         }
 
-        QJsonObject robot_obj = config["robot"].toObject();
-        project1_config->robot->loadRobotFromObject(robot_obj);
+        for(const QString& key: robot_obj.keys()) {
+            /*if(key.startsWith("combo")) {
+                project1_config->evolution->combo_map[key] = evolution_obj.value(key).toString();
+            }
+            else if(key.startsWith("spin")) {
+                project1_config->evolution->spin_map[key] = evolution_obj.value(key).toInt();
+            }
+            else if(key.startsWith("dspin")) {
+                project1_config->evolution->double_spin_map[key] = evolution_obj.value(key).toDouble();
+            }
+            else */if(key.startsWith("check")) {
+                project1_config->robot->bool_map[key] = robot_obj.value(key).toBool();
+            }
+            else if(key.startsWith("line")) {
+                project1_config->robot->text_map[key] = robot_obj.value(key).toString();
+            }
+        }
+
+
+        QJsonObject robot_definition_obj = robot_obj["definition"].toObject();
+        project1_config->robot->loadRobotFromObject(robot_definition_obj);
     }
 
     //current_config = dynamic_cast<ProjectConfiguration*>(ui->tree_project->topLevelItem(0));
@@ -546,6 +580,15 @@ bool MainWindow::onSaveProject()
         for(auto& pair: config->evolution->double_spin_map) {
             evolution_obj[pair.first] = pair.second;
         }
+
+        for(auto& pair: config->evolution->bool_map) {
+            evolution_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->evolution->text_map) {
+            evolution_obj[pair.first] = pair.second;
+        }
+
         config_obj["evolution"] = evolution_obj;
 
         QJsonObject simulation_obj;
@@ -561,6 +604,14 @@ bool MainWindow::onSaveProject()
             simulation_obj[pair.first] = pair.second;
         }
 
+        for(auto& pair: config->simulation->bool_map) {
+            simulation_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->simulation->text_map) {
+            simulation_obj[pair.first] = pair.second;
+        }
+
         for(auto& run_item: config->run_list) {
             QJsonObject run_obj;
             run_obj["name"] = run_item->text();
@@ -568,9 +619,20 @@ bool MainWindow::onSaveProject()
             run_array.push_back(run_obj);
         }
 
+        QJsonObject robot_obj;
+        for(auto& pair: config->robot->bool_map) {
+            robot_obj[pair.first] = pair.second;
+        }
+
+        for(auto& pair: config->robot->text_map) {
+            robot_obj[pair.first] = pair.second;
+        }
+
+        robot_obj["definition"] = config->robot->get_json();
+
         config_obj["simulation"] = simulation_obj;
         config_obj["name"] = config->text();
-        config_obj["robot"] = config->robot->get_json();
+        config_obj["robot"] = robot_obj;
         config_obj["root_directory"] = config->root_directory;
         config_obj["run_list"] = run_array;
         config_array.push_back(config_obj);
@@ -699,12 +761,27 @@ void MainWindow::onEvolve()
         QString program = robogen_path + "/robogen-evolver";
         QStringList arguments;
         QString seed;
-        /*if(ui->check_randomseed->isChecked())
+        if(ui->check_randomseed->isChecked())
             seed = QString::number(qrand());
         else
-            seed = QString::number(ui->spin_seed->value());*/
-        seed = "0";
+            seed = QString::number(ui->spin_seed->value());
+
+        if(ui->check_custom_robot->isChecked()) {
+            QFile(project_directory + "/tmp/robot.txt").remove();
+            QFile::copy(ui->line_custom_robot->text(), project_directory + "/tmp/robot.txt");
+        }
+
+        if(ui->check_custom_simulation->isChecked()) {
+            QFile(project_directory + "/tmp/sim.txt").remove();
+            QFile::copy(ui->line_custom_simulation->text(), project_directory + "/tmp/sim.txt");
+        }
+
+        if(ui->check_custom_evolution->isChecked()) {
+            QFile(project_directory + "/tmp/evo.txt").remove();
+            QFile::copy(ui->line_custom_evolution->text(), project_directory + "/tmp/evo.txt");
+        }
         arguments << seed << current_run_path << project_directory + "/tmp/evo.txt" << "--overwrite";
+
         qDebug() << "arguments: " << arguments << endl;
 
         process_evolve = new QProcess(this);
@@ -737,6 +814,10 @@ void MainWindow::saveSimulation()
         for(QCheckBox* child: ui->tab_simulation->findChildren<QCheckBox*>()) {
             current_config->simulation->bool_map[child->objectName()] = child->isChecked();
         }
+
+        for(QLineEdit* child: ui->tab_simulation->findChildren<QLineEdit*>()) {
+            current_config->simulation->text_map[child->objectName()] = child->text();
+        }
     }
 }
 
@@ -763,6 +844,11 @@ void MainWindow::loadSimulation()
             QCheckBox* child = ui->tab_simulation->findChild<QCheckBox*>(pair.first);
             child->setChecked(pair.second);
         }
+
+        for(auto& pair: current_config->simulation->text_map) {
+            QLineEdit* child = ui->tab_simulation->findChild<QLineEdit*>(pair.first);
+            child->setText(pair.second);
+        }
     }
 }
 
@@ -784,6 +870,10 @@ void MainWindow::saveEvolution()
 
         for(QCheckBox* child: ui->tab_evolution->findChildren<QCheckBox*>()) {
             current_config->evolution->bool_map[child->objectName()] = child->isChecked();
+        }
+
+        for(QLineEdit* child: ui->tab_evolution->findChildren<QLineEdit*>()) {
+            current_config->evolution->text_map[child->objectName()] = child->text();
         }
     }
 }
@@ -811,6 +901,11 @@ void MainWindow::loadEvolution()
             QCheckBox* child = ui->tab_evolution->findChild<QCheckBox*>(pair.first);
             child->setChecked(pair.second);
         }
+
+        for(auto& pair: current_config->evolution->text_map) {
+            QLineEdit* child = ui->tab_evolution->findChild<QLineEdit*>(pair.first);
+            child->setText(pair.second);
+        }
     }
 }
 
@@ -819,6 +914,14 @@ void MainWindow::saveRobot()
     if(current_config) {
         //qDebug() << "saveRobot" << endl;
         //ui->robotConfigTree->takeTopLevelItem(0);
+
+        for(QCheckBox* child: ui->tab_robot->findChildren<QCheckBox*>()) {
+            current_config->robot->bool_map[child->objectName()] = child->isChecked();
+        }
+
+        for(QLineEdit* child: ui->tab_robot->findChildren<QLineEdit*>()) {
+            current_config->robot->text_map[child->objectName()] = child->text();
+        }
     }
 }
 
@@ -828,6 +931,16 @@ void MainWindow::loadRobot()
         //qDebug() << "loadRobot" << endl;
         ui->robotConfigTree->addTopLevelItem(current_config->robot->root_part);
         ui->robotConfigTree->expandAll();
+
+        for(auto& pair: current_config->robot->bool_map) {
+            QCheckBox* child = ui->tab_robot->findChild<QCheckBox*>(pair.first);
+            child->setChecked(pair.second);
+        }
+
+        for(auto& pair: current_config->robot->text_map) {
+            QLineEdit* child = ui->tab_robot->findChild<QLineEdit*>(pair.first);
+            child->setText(pair.second);
+        }
     }
 }
 
@@ -882,6 +995,10 @@ void MainWindow::onProjectTreeAdd()
 void MainWindow::onProjectTreeRemove()
 {
     ProjectConfiguration* item = dynamic_cast<ProjectConfiguration*>(ui->tree_project->currentItem());
+    if(item == current_running_config) {
+        QMessageBox::critical(this, "Error", "You cannot delete the currently running configuration, stop it first");
+        return;
+    }
     if(item != nullptr) {
         if(item->root_directory != "") QDir(item->root_directory).removeRecursively();
         delete item;
@@ -1028,8 +1145,10 @@ void MainWindow::writeEvolution()
     {
         QTextStream stream( &file );
         stream << "# GENERATED BY ROBOGEN GUI" << endl;
+
         stream <<"simulatorConfFile=" << project_directory + "/tmp/sim.txt" << endl;
         stream <<"referenceRobotFile=" << project_directory + "/tmp/robot.txt" << endl;
+
         stream <<"mu=" << ui->spin_mu->value() << endl;
         stream <<"lambda=" << ui->spin_lambda->value() << endl;
         stream <<"selection="<< ui->combo_selection->currentText() << endl;
@@ -1079,8 +1198,8 @@ void MainWindow::writeSimulation()
     {
         QTextStream stream( &file );
         stream << "# GENERATED BY ROBOGEN GUI" << endl;
-        if(ui->check_customscenario->isChecked())
-            stream <<"scenario=" << ui->line_scenario->text() << endl;
+        if(ui->check_custom_scenario->isChecked())
+            stream <<"scenario=" << ui->line_custom_scenario->text() << endl;
         else
             stream <<"scenario=" << ui->combo_scenario->currentText() << endl;
         stream <<"timeStep=" << ui->dspin_timestep->value() << endl;
@@ -1103,11 +1222,11 @@ void MainWindow::writeSimulation()
         QMessageBox::critical(this, "Error", "Failed to save simulation config to: " + filename);
     }
 }
-
+/*
 QJsonObject MainWindow::getPartJsonObject(RobotPart* part)
 {
     QJsonObject obj;
-    /*QJsonObject obj;
+    QJsonObject obj;
     QString type;
     QString name;
     switch(part->type)
@@ -1168,9 +1287,9 @@ QJsonObject MainWindow::getPartJsonObject(RobotPart* part)
         writeRobotPart(dynamic_cast<RobotPart*>(part->child(i)), tab+1,stream);
     }
 
-    return obj;*/
     return obj;
-}
+    return obj;
+}*/
 
 QJsonObject MainWindow::getRobotJsonObject()
 {

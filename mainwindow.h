@@ -33,7 +33,7 @@ public:
     static QString stringFromType(PART_TYPE tp);
     static PART_TYPE typeFromString(const QString& str);
     QJsonObject getRobotJsonObject();
-    QJsonObject getPartJsonObject(RobotPart* part);
+    //QJsonObject getPartJsonObject(RobotPart* part);
 
 public slots:
     void onProjectTreeSelect(QListWidgetItem*);
