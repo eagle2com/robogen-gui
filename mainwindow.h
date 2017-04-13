@@ -13,7 +13,6 @@
 #include "settingswindow.h"
 
 #include "configurations.h"
-#include "ui_tutorial.h"
 
 namespace Ui {
 class MainWindow;
@@ -91,9 +90,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    Ui::Dialog ui_tutorial;
-    QDialog* dialog_tutorial;
-
 
     QFileSystemWatcher *fs_watcher = nullptr;
 

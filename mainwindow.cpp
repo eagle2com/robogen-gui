@@ -122,10 +122,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // === NEW PROJECT ===
     onNewProject();
-
-    dialog_tutorial = new QDialog(this);
-    ui_tutorial.setupUi(dialog_tutorial);
-    connect(ui->actionTutorial, SIGNAL(triggered(bool)), dialog_tutorial, SLOT(show()));
 }
 
 /*

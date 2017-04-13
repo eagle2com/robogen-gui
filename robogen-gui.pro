@@ -40,8 +40,7 @@ FORMS    += mainwindow.ui \
     #simulationconfigform.ui \
     #robotconfigform.ui \
     #configoverviewform.ui \
-    settingswindow.ui \
-    tutorial.ui
+    settingswindow.ui
 
 RESOURCES += \
     res.qrc

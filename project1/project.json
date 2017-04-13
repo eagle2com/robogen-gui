@@ -65,11 +65,11 @@
             "root_directory": "E:/dev/robogen-gui/project1/runs/config_17_04_13__01_20_28__0",
             "run_list": [
                 {
-                    "name": "run_17_04_13__01_20_28__0",
+                    "name": "run1",
                     "path": "run_17_04_13__01_20_28__0"
                 },
                 {
-                    "name": "run_17_04_13__01_21_00__1",
+                    "name": "run2",
                     "path": "run_17_04_13__01_21_00__1"
                 },
                 {
