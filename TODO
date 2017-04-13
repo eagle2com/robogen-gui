@@ -1,6 +1,7 @@
 TODO
-- Custom js scenario
+- Change simulation time/position purely for the visualization
 
 DONE
 - Custom config files
 - Prevent deleting currently running configuration
+- Custom js scenario
