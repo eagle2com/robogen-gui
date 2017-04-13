@@ -2,7 +2,7 @@
     "configurations": [
         {
             "evolution": {
-                "combo_evolutionaryalgorithm": "Basic",
+                "combo_evolutionaryalgorithm": "HyperNEAT",
                 "combo_evolutionmode": "brain",
                 "combo_replacement": "plus",
                 "combo_selection": "deterministic-tournament",
@@ -16,7 +16,7 @@
                 "dspin_psubtreeduplicate": 0.2,
                 "dspin_psubtreeremove": 0.1,
                 "dspin_psubtreeswap": 0.2,
-                "spin_generations": 50,
+                "spin_generations": 250,
                 "spin_lambda": 20,
                 "spin_maxbodyparts": 1000,
                 "spin_mu": 20,
@@ -28,36 +28,204 @@
                 "body": {
                     "connection": [
                         {
-                            "dest": "PARTGEN_202826640",
+                            "dest": "Hip1",
                             "destSlot": 0,
-                            "src": "ROOT",
+                            "src": "Core",
+                            "srcSlot": 1
+                        },
+                        {
+                            "dest": "UpperLeg1",
+                            "destSlot": 0,
+                            "src": "Hip1",
                             "srcSlot": 0
                         },
                         {
-                            "dest": "PARTGEN_202827760",
+                            "dest": "Knee1",
                             "destSlot": 0,
-                            "src": "ROOT",
-                            "srcSlot": 1
+                            "src": "UpperLeg1",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "LowerLeg1",
+                            "destSlot": 0,
+                            "src": "Knee1",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Hip2",
+                            "destSlot": 0,
+                            "src": "Core",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "UpperLeg2",
+                            "destSlot": 0,
+                            "src": "Hip2",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Knee2",
+                            "destSlot": 0,
+                            "src": "UpperLeg2",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "LowerLeg2",
+                            "destSlot": 0,
+                            "src": "Knee2",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Hip3",
+                            "destSlot": 0,
+                            "src": "Core",
+                            "srcSlot": 2
+                        },
+                        {
+                            "dest": "UpperLeg3",
+                            "destSlot": 0,
+                            "src": "Hip3",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Knee3",
+                            "destSlot": 0,
+                            "src": "UpperLeg3",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "LowerLeg3",
+                            "destSlot": 0,
+                            "src": "Knee3",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Hip4",
+                            "destSlot": 0,
+                            "src": "Core",
+                            "srcSlot": 3
+                        },
+                        {
+                            "dest": "UpperLeg4",
+                            "destSlot": 0,
+                            "src": "Hip4",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "Knee4",
+                            "destSlot": 0,
+                            "src": "UpperLeg4",
+                            "srcSlot": 0
+                        },
+                        {
+                            "dest": "LowerLeg4",
+                            "destSlot": 0,
+                            "src": "Knee4",
+                            "srcSlot": 0
                         }
                     ],
                     "part": [
                         {
-                            "id": "ROOT",
+                            "id": "Core",
                             "orientation": 0,
                             "root": true,
                             "type": "CoreComponent"
                         },
                         {
-                            "id": "PARTGEN_202826640",
+                            "id": "Hip1",
+                            "orientation": 1,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "UpperLeg1",
+                            "orientation": 1,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Knee1",
                             "orientation": 0,
                             "root": false,
                             "type": "ActiveHinge"
                         },
                         {
-                            "id": "PARTGEN_202827760",
+                            "id": "LowerLeg1",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Hip2",
+                            "orientation": 3,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "UpperLeg2",
+                            "orientation": 1,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Knee2",
                             "orientation": 0,
                             "root": false,
                             "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "LowerLeg2",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Hip3",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "UpperLeg3",
+                            "orientation": 1,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Knee3",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "LowerLeg3",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Hip4",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "UpperLeg4",
+                            "orientation": 1,
+                            "root": false,
+                            "type": "FixedBrick"
+                        },
+                        {
+                            "id": "Knee4",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
+                        },
+                        {
+                            "id": "LowerLeg4",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "FixedBrick"
                         }
                     ]
                 }
@@ -65,16 +233,12 @@
             "root_directory": "E:/dev/robogen-gui/project1/runs/config_17_04_13__01_20_28__0",
             "run_list": [
                 {
-                    "name": "run1",
-                    "path": "run_17_04_13__01_20_28__0"
+                    "name": "run_17_04_13__02_41_10__0",
+                    "path": "run_17_04_13__02_41_10__0"
                 },
                 {
-                    "name": "run2",
-                    "path": "run_17_04_13__01_21_00__1"
-                },
-                {
-                    "name": "prouti",
-                    "path": "run_17_04_13__01_21_17__2"
+                    "name": "run_17_04_13__02_41_53__1",
+                    "path": "run_17_04_13__02_41_53__1"
                 }
             ],
             "simulation": {
@@ -92,7 +256,7 @@
         },
         {
             "evolution": {
-                "combo_evolutionaryalgorithm": "Basic",
+                "combo_evolutionaryalgorithm": "HyperNEAT",
                 "combo_evolutionmode": "brain",
                 "combo_replacement": "plus",
                 "combo_selection": "deterministic-tournament",
@@ -106,65 +270,7 @@
                 "dspin_psubtreeduplicate": 0.2,
                 "dspin_psubtreeremove": 0.1,
                 "dspin_psubtreeswap": 0.2,
-                "spin_generations": 50,
-                "spin_lambda": 20,
-                "spin_maxbodyparts": 1000,
-                "spin_mu": 20,
-                "spin_seed": 0,
-                "spin_tournament": 2
-            },
-            "name": "config2",
-            "robot": {
-                "body": {
-                    "connection": [
-                    ],
-                    "part": [
-                        {
-                            "id": "ROOT",
-                            "orientation": 0,
-                            "root": true,
-                            "type": "CoreComponent"
-                        }
-                    ]
-                }
-            },
-            "root_directory": "E:/dev/robogen-gui/project1/runs/config_17_04_13__01_22_27__0",
-            "run_list": [
-                {
-                    "name": "run_17_04_13__01_22_27__0",
-                    "path": "run_17_04_13__01_22_27__0"
-                }
-            ],
-            "simulation": {
-                "combo_scenario": "racing",
-                "combo_terraintype": "flat",
-                "dspin_actuationfrequency": 25,
-                "dspin_motornoiselevel": 0,
-                "dspin_sensornoiselevel": 0,
-                "dspin_terrainfriction": 1,
-                "dspin_terrainlength": 5,
-                "dspin_terrainwidth": 5,
-                "dspin_timestep": 0.005,
-                "spin_ntimesteps": 800
-            }
-        },
-        {
-            "evolution": {
-                "combo_evolutionaryalgorithm": "Basic",
-                "combo_evolutionmode": "brain",
-                "combo_replacement": "plus",
-                "combo_selection": "deterministic-tournament",
-                "dspin_brainsigma": 0.7,
-                "dspin_paddhiddenneuron": 0,
-                "dspin_pbraincrossover": 0,
-                "dspin_pbrainmutate": 0.3,
-                "dspin_pnodeinsert": 0.5,
-                "dspin_pnoderemove": 0.1,
-                "dspin_pparemetermodify": 0.1,
-                "dspin_psubtreeduplicate": 0.2,
-                "dspin_psubtreeremove": 0.1,
-                "dspin_psubtreeswap": 0.2,
-                "spin_generations": 50,
+                "spin_generations": 250,
                 "spin_lambda": 20,
                 "spin_maxbodyparts": 1000,
                 "spin_mu": 20,
@@ -175,6 +281,12 @@
             "robot": {
                 "body": {
                     "connection": [
+                        {
+                            "dest": "PARTGEN_3964559776",
+                            "destSlot": 0,
+                            "src": "ROOT",
+                            "srcSlot": 0
+                        }
                     ],
                     "part": [
                         {
@@ -182,12 +294,22 @@
                             "orientation": 0,
                             "root": true,
                             "type": "CoreComponent"
+                        },
+                        {
+                            "id": "PARTGEN_3964559776",
+                            "orientation": 0,
+                            "root": false,
+                            "type": "ActiveHinge"
                         }
                     ]
                 }
             },
-            "root_directory": "",
+            "root_directory": "E:/dev/robogen-gui/project1/runs/config_17_04_13__03_40_22__0",
             "run_list": [
+                {
+                    "name": "run_17_04_13__03_40_22__0",
+                    "path": "run_17_04_13__03_40_22__0"
+                }
             ],
             "simulation": {
                 "combo_scenario": "racing",

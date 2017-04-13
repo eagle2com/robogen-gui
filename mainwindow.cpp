@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->tree_runs, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onRunItemDoubleClicked(QListWidgetItem*)));
     connect(ui->tree_project, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(onProjectConfigDoubleClicked(QListWidgetItem*)));
 
+    connect(ui->push_webgl, SIGNAL(clicked(bool)), this, SLOT(onPushWebGL()));
+
    // connect(ui->tabWidge)
 
     // ========================== EVOLUTION TAB SETUP =================================
@@ -122,6 +124,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // === NEW PROJECT ===
     onNewProject();
+    //custom_browser = new CustomBrowser();
 }
 
 /*
@@ -193,6 +196,31 @@ void MainWindow::onPushSimulate()
     process_simulate = new QProcess(this);
     process_simulate->setWorkingDirectory(settings_window->get_robogen_directory());
     process_simulate->start(program, arguments);
+}
+
+void MainWindow::onPushWebGL()
+{
+    QString program = settings_window->get_robogen_directory() + "/robogen-file-viewer";
+    QStringList arguments;
+
+    if(!ui->tree_runs->currentItem()) return;
+    if(!ui->list_generations->currentItem()) return;
+    RunTreeItem* run_item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+    QString generation_path = current_config->root_directory + "/" + run_item->path + "/"+ ui->list_generations->currentItem()->text();
+
+    arguments << generation_path
+              << current_config->root_directory + "/" + run_item->path + "/sim.txt"<< "1"<<"--output" << project_directory + "/web/"
+              << "--no-visualization"
+              << "--webgl"
+              << "--overwrite";
+    process_simulate = new QProcess(this);
+    process_simulate->setProcessChannelMode(QProcess::ForwardedChannels);
+    process_simulate->setWorkingDirectory(settings_window->get_robogen_directory());
+    process_simulate->start(program, arguments);
+    ui->push_webgl->setText("SIMULATING");
+    process_simulate->waitForFinished();
+    ui->push_webgl->setText("WebGL");
+    //custom_browser->show();
 }
 
 void MainWindow::onPushAnalyze()
@@ -823,6 +851,8 @@ void MainWindow::onProjectTreeSelect(QListWidgetItem *item_)
     while(ui->tree_runs->count() > 0) {
         ui->tree_runs->takeItem(0);
     }
+
+    ui->list_generations->clear();
 
     if(item_ == nullptr) {
         ui->tabWidget->setEnabled(false);

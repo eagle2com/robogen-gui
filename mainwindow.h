@@ -11,6 +11,7 @@
 #include "dirwatcher.h"
 
 #include "settingswindow.h"
+#include "custombrowser.h"
 
 #include "configurations.h"
 
@@ -43,6 +44,7 @@ public slots:
     //void loadEvolution();
 
     void onPushSimulate();
+    void onPushWebGL();
     void onPushAnalyze();
     void onPushStop();
     void onFileChanged(QString filename);
@@ -106,6 +108,7 @@ private:
     DirWatcher dir_watcher;
 
     SettingsWindow* settings_window = nullptr;
+    CustomBrowser* custom_browser = nullptr;
 
     ProjectConfiguration* current_config = nullptr;
     ProjectConfiguration* current_running_config = nullptr;
