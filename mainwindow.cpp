@@ -711,11 +711,12 @@ void MainWindow::onEvolve()
         ui->tree_runs->addItem(run_item);
     }
 
-
-
     QString robogen_path = settings_window->get_robogen_directory();
-
+#if defined(Q_OS_WIN)
+    QFile robogen_server_file(robogen_path + "/robogen-server.exe");
+#elif defined(Q_OS_LINUX)
     QFile robogen_server_file(robogen_path + "/robogen-server");
+#endif
     if(!robogen_server_file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(this, "Error", "Could not find robogen-server in the robogen directory, please check file->settings");
         return;
