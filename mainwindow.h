@@ -11,7 +11,6 @@
 #include "dirwatcher.h"
 
 #include "settingswindow.h"
-#include "custombrowser.h"
 
 #include "configurations.h"
 
@@ -108,7 +107,6 @@ private:
     DirWatcher dir_watcher;
 
     SettingsWindow* settings_window = nullptr;
-    CustomBrowser* custom_browser = nullptr;
 
     ProjectConfiguration* current_config = nullptr;
     ProjectConfiguration* current_running_config = nullptr;

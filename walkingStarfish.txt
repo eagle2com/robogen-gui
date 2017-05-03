@@ -1,0 +1,28 @@
+0 CoreComponent Core 0
+	0 ActiveHinge Hip1 1
+		0 FixedBrick UpperLeg1 1
+			0 ActiveHinge Knee1 0
+				0 FixedBrick LowerLeg1 0
+	1 ActiveHinge Hip2 3
+		0 FixedBrick UpperLeg2 1
+			0 ActiveHinge Knee2 0
+				0 FixedBrick LowerLeg2 0
+	2 ActiveHinge Hip3 0
+		0 FixedBrick UpperLeg3 1
+			0 ActiveHinge Knee3 0
+				0 FixedBrick LowerLeg3 0
+	3 ActiveHinge Hip4 0
+		0 FixedBrick UpperLeg4 1
+			0 ActiveHinge Knee4 0
+				0 FixedBrick LowerLeg4 0
+
+
+
+Hip1 0 oscillator 1.00001192093 -0.222714111209 0.999634742737
+Hip2 0 oscillator 1.00002563 0.351269364357 0.997304320335
+Hip3 0 oscillator 1.0003041029 -0.155001461506 0.998930215836
+Hip4 0 oscillator 1.00000095367 0.286795049906 0.999082744122
+Knee1 0 oscillator 1.00000274181 -0.880295932293 0.999992489815
+Knee2 0 oscillator 1.00011503696 0.908324718475 0.88366740942
+Knee3 0 oscillator 1.0133523941 -0.333022326231 0.998555779457
+Knee4 0 oscillator 1.0 0.451755940914 0.999317109585

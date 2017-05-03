@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui axcontainer
+QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -21,8 +21,7 @@ SOURCES += main.cpp\
    # configoverviewform.cpp \
     settingswindow.cpp \
     configurations.cpp \
-    customlistwidget.cpp \
-    custombrowser.cpp
+    customlistwidget.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -33,8 +32,7 @@ HEADERS  += mainwindow.h \
     #configoverviewform.h \
     settingswindow.h \
     configurations.h \
-    customlistwidget.h \
-    custombrowser.h
+    customlistwidget.h
 
 FORMS    += mainwindow.ui \
     #testwindow.ui \
@@ -42,8 +40,7 @@ FORMS    += mainwindow.ui \
     #simulationconfigform.ui \
     #robotconfigform.ui \
     #configoverviewform.ui \
-    settingswindow.ui \
-    custombrowser.ui
+    settingswindow.ui
 
 RESOURCES += \
     res.qrc

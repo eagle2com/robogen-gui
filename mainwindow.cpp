@@ -498,7 +498,7 @@ void MainWindow::onOpenProject()
             }
         }
 
-        for(auto& run_item: run_array) {
+        for(auto const & run_item: run_array) {
             QJsonObject run_obj = run_item.toObject();
             RunTreeItem* new_run_item = new RunTreeItem();
             new_run_item->setText(run_obj["name"].toString());
@@ -714,9 +714,10 @@ void MainWindow::onEvolve()
 
 
     QString robogen_path = settings_window->get_robogen_directory();
-    QFile robogen_server_file(robogen_path + "/robogen-server.exe");
+
+    QFile robogen_server_file(robogen_path + "/robogen-server");
     if(!robogen_server_file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, "Error", "Could not find robogen-server.exe in the robogen directory, please check file->settings");
+        QMessageBox::critical(this, "Error", "Could not find robogen-server in the robogen directory, please check file->settings");
         return;
     }
 
@@ -1478,7 +1479,7 @@ void writeRobotPart(RobotPart* part, int tab, QTextStream& stream)
     }
     name = part->name;
     if(name.isEmpty())
-        name = "PARTGEN_" + QString::number((ULONG64)part);
+        name = "PARTGEN_" + QString::number((ulong)part);
 
     stream << (int)part->face <<" " << type <<" "<< name << " " << (int)part->rotation;
     if(part->type == PART_TYPE::PARAMETRIC_JOINT)
