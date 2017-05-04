@@ -122,9 +122,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->push_load, SIGNAL(clicked()), this, SLOT(onLoadRobot()));
 
+    log_window = new LogWindow(this);
+    log_window->show();
+
+    connect(ui->actionLog, SIGNAL(triggered(bool)), log_window, SLOT(show()));
+
+
     // === NEW PROJECT ===
     onNewProject();
     //custom_browser = new CustomBrowser();
+
+
 }
 
 /*
@@ -407,6 +415,7 @@ void MainWindow::onEvolveFinished(int s)
     qDebug() << "evolve finished: " << s << endl;
     delete fs_watcher; fs_watcher = nullptr;
 
+    onPushStop();
     current_running_config = nullptr;
     ui->push_stop->setEnabled(false);
     ui->push_evolve->setEnabled(true);
@@ -722,6 +731,8 @@ void MainWindow::onEvolve()
         return;
     }
 
+    log_window->onNewEvolution();
+
     ui->push_evolve->setDisabled(true);
     ui->push_stop->setEnabled(true);
     ui->progressBar->setValue(0);
@@ -735,10 +746,13 @@ void MainWindow::onEvolve()
             arguments.clear();
             arguments << QString::number(8000 + i + 1);
             QProcess *process = new QProcess(this);
-            process->setProcessChannelMode(QProcess::ForwardedErrorChannel);
+            //process->setProcessChannelMode(QProcess::ForwardedErrorChannel);
             process->start(program, arguments);
             process_list.push_back(process);
+            connect(process, SIGNAL(readyReadStandardOutput()), log_window, SLOT(onServerLog()));
+            connect(process, SIGNAL(readyReadStandardError()), log_window, SLOT(onServerError()));
 
+            //connect(process, SIGNAL()
             //qDebug() << "Launching server #" << i + 1 << endl;;
         }
 
@@ -787,8 +801,12 @@ void MainWindow::onEvolve()
         qDebug() << "arguments: " << arguments << endl;
 
         process_evolve = new QProcess(this);
-        process_evolve->setProcessChannelMode(QProcess::ForwardedErrorChannel);
+        connect(process_evolve, SIGNAL(readyReadStandardOutput()), log_window, SLOT(onEvolverLog()));
+        connect(process_evolve, SIGNAL(readyReadStandardError()), log_window, SLOT(onEvolverError()));
+
+        //process_evolve->setProcessChannelMode(QProcess::ForwardedErrorChannel);
         process_evolve->start(program, arguments);
+
 
         connect(process_evolve, SIGNAL(finished(int)), this, SLOT(onEvolveFinished(int)));
         process_evolve->waitForStarted();

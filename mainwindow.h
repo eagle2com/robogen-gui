@@ -13,6 +13,7 @@
 #include "settingswindow.h"
 
 #include "configurations.h"
+#include "logwindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -110,6 +111,8 @@ private:
 
     ProjectConfiguration* current_config = nullptr;
     ProjectConfiguration* current_running_config = nullptr;
+
+    LogWindow* log_window = nullptr;
 
     QString current_run_name = "";
     QString current_run_path = "";

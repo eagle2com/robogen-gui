@@ -21,7 +21,8 @@ SOURCES += main.cpp\
    # configoverviewform.cpp \
     settingswindow.cpp \
     configurations.cpp \
-    customlistwidget.cpp
+    customlistwidget.cpp \
+    logwindow.cpp
 
 HEADERS  += mainwindow.h \
     qcustomplot.h \
@@ -32,7 +33,8 @@ HEADERS  += mainwindow.h \
     #configoverviewform.h \
     settingswindow.h \
     configurations.h \
-    customlistwidget.h
+    customlistwidget.h \
+    logwindow.h
 
 FORMS    += mainwindow.ui \
     #testwindow.ui \
@@ -40,7 +42,8 @@ FORMS    += mainwindow.ui \
     #simulationconfigform.ui \
     #robotconfigform.ui \
     #configoverviewform.ui \
-    settingswindow.ui
+    settingswindow.ui \
+    logwindow.ui
 
 RESOURCES += \
     res.qrc
