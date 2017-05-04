@@ -123,7 +123,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->push_load, SIGNAL(clicked()), this, SLOT(onLoadRobot()));
 
     log_window = new LogWindow(this);
-    log_window->show();
 
     connect(ui->actionLog, SIGNAL(triggered(bool)), log_window, SLOT(show()));
 
@@ -249,16 +248,26 @@ void MainWindow::onPushAnalyze()
     QVector<double> v_best, v_avg, v_std_up, v_std_down;
     QVector<double> v_x;
 
+    QString line;
+
+    try {
+
     while(!in.atEnd())
     {
         int x;
         double best, avg, std;
-        in >> x >> best >> avg >> std;
+        in.readLineInto(&line);
+        sscanf(line.toStdString().c_str(), "%d %lf %lf %lf", &x, &best, &avg, &std);
         v_best.push_back(best);
         v_avg.push_back(avg);
         v_std_up.push_back(avg + std);
         v_std_down.push_back(avg - std);
         v_x.push_back(x);
+    }
+    }
+    catch(...) {
+        QMessageBox::critical(this, "Error in analyzer", "Failed to parse BestAvgStd.txt, check the content of file in the folder of the current run.");
+        return;
     }
 
     QCustomPlot *customPlot = new QCustomPlot;
@@ -447,6 +456,7 @@ void MainWindow::onOpenProject()
     QFile project_file(project_directory + "/project.json");
     if(!project_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Saving Error", "Could not open " + project_directory + " for reading\nProject open failed");
+        project_directory = "";
         return;
     }
 

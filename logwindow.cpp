@@ -5,6 +5,10 @@
 #include <QProcess>
 #include <QPushButton>
 
+#ifdef Q_OS_WIN
+    #include <windows.h>
+#endif
+
 LogWindow::LogWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LogWindow)
@@ -13,6 +17,9 @@ LogWindow::LogWindow(QWidget *parent) :
 
     connect(ui->push_evolver_clear, SIGNAL(clicked(bool)), ui->list_error_evolver, SLOT(clear()));
     connect(ui->push_server_clear, SIGNAL(clicked(bool)), ui->list_error_server, SLOT(clear()));
+    this->show();
+
+    SetWindowPos((HWND)this->winId(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
 LogWindow::~LogWindow()

@@ -48,6 +48,9 @@ FORMS    += mainwindow.ui \
 RESOURCES += \
     res.qrc
 
+win32 {
+LIBS += -luser32
+}
 DISTFILES += \
     TODO \
     test.py
