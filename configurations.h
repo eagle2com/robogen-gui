@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <map>
 #include <QListWidget>
+#include <qcustomplot.h>
 
 enum class PART_TYPE {CORE_COMPONENT, FIXED_BRICK, ACTIVE_HINGE, PASSIVE_HINGE, PARAMETRIC_JOINT, LIGHT_SENSOR, IR_SENSOR, ACTIVE_WHEEL, PASSIVE_WHEEL};
 enum class PART_FACE {FRONT, BACK, RIGHT, LEFT};

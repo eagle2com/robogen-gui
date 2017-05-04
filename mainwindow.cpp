@@ -230,12 +230,18 @@ void MainWindow::onPushWebGL()
     //custom_browser->show();
 }
 
-void MainWindow::onPushAnalyze()
+void MainWindow::onPushAnalyze(bool user_activated)
 {
-    if(!current_config) return;
-    if(!ui->tree_runs->currentItem()) return;
-    RunTreeItem* item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
-    QString path = current_config->root_directory + "/" + item->path + "/BestAvgStd.txt";
+    QString path = "";
+    if(user_activated) {
+        if(!current_config) return;
+        if(!ui->tree_runs->currentItem()) return;
+        RunTreeItem* item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+        path = current_config->root_directory + "/" + item->path + "/BestAvgStd.txt";
+
+    } else {
+        path = current_run_path + "/BestAvgStd.txt";
+    }
 
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -270,73 +276,97 @@ void MainWindow::onPushAnalyze()
         return;
     }
 
-    QCustomPlot *customPlot = new QCustomPlot;
-    customPlot->legend->setVisible(true);
-    customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
-    customPlot->legend->setTextColor(Qt::white);
-    customPlot->legend->setBrush(QBrush(QColor(255, 255, 255, 20)));
+    QCustomPlot *customPlot;
+    QCPGraph *graph1;
+    QCPGraph *graph2;
+    QCPGraph *graph3;
+    QCPGraph *graph4;
+    if(plot) {
+        customPlot = plot;
+        graph1 = graph_best;
+        graph2 = graph_avg;
+        graph3 = graph_std_up;
+        graph4 = graph_std_down;
+    }else
+    {
+        customPlot = new QCustomPlot;
+        customPlot->legend->setVisible(true);
+        customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+        customPlot->legend->setTextColor(Qt::white);
+        customPlot->legend->setBrush(QBrush(QColor(255, 255, 255, 20)));
 
-    QCPGraph *graph1 = customPlot->addGraph();
+        graph1 = customPlot->addGraph();
+        graph1->setPen(QPen(QColor(255, 255, 255), 2));
+        graph1->setName("Average");
+
+        graph2 = customPlot->addGraph();
+        graph2->setPen(QPen(QColor(0,0,255,64),2));
+        graph2->setBrush(QColor(200, 200, 200, 20));
+        graph2->setChannelFillGraph(graph1);
+        graph2->setName("STD");
+
+        graph3 = customPlot->addGraph();
+        graph3->setPen(QPen(QColor(0,0,255,64),2));
+        graph3->setBrush(QColor(200, 200, 200, 20));
+        graph3->setChannelFillGraph(graph1);
+        graph3->setName("STD");
+
+        graph4 = customPlot->addGraph();
+       // graph1->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QPen(Qt::black, 1.5), QBrush(Qt::white), 9));
+        graph4->setPen(QPen(QColor(20, 200, 20), 2));
+        graph4->setName("Best");
+
+        // set some pens, brushes and backgrounds:
+        customPlot->xAxis->setBasePen(QPen(Qt::white, 1));
+        customPlot->yAxis->setBasePen(QPen(Qt::white, 1));
+        customPlot->xAxis->setTickPen(QPen(Qt::white, 1));
+        customPlot->yAxis->setTickPen(QPen(Qt::white, 1));
+        customPlot->xAxis->setSubTickPen(QPen(Qt::white, 1));
+        customPlot->yAxis->setSubTickPen(QPen(Qt::white, 1));
+        customPlot->xAxis->setTickLabelColor(Qt::white);
+        customPlot->yAxis->setTickLabelColor(Qt::white);
+        customPlot->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+        customPlot->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+        customPlot->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+        customPlot->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+        customPlot->xAxis->grid()->setSubGridVisible(true);
+        customPlot->yAxis->grid()->setSubGridVisible(true);
+        customPlot->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+        customPlot->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+        customPlot->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+        customPlot->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+
+
+        QLinearGradient plotGradient;
+        plotGradient.setStart(0, 0);
+        plotGradient.setFinalStop(0, 350);
+        plotGradient.setColorAt(0, QColor(80, 80, 80));
+        plotGradient.setColorAt(1, QColor(50, 50, 50));
+        customPlot->setBackground(plotGradient);
+
+        plot = customPlot;
+        graph_best = graph1;
+        graph_avg = graph2;
+        graph_std_up = graph3;
+        graph_std_down = graph4;
+
+        customPlot->resize(800,600);
+        customPlot->setWindowTitle("Robogen Generations Plot");
+
+    }
+
+
     graph1->setData(v_x, v_avg);
-   // graph1->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QPen(Qt::black, 1.5), QBrush(Qt::white), 9));
-    graph1->setPen(QPen(QColor(255, 255, 255), 2));
-    graph1->setName("Average");
-
-    QCPGraph *graph2 = customPlot->addGraph();
     graph2->setData(v_x, v_std_up);
-    graph2->setPen(QPen(QColor(0,0,255,64),2));
-    graph2->setBrush(QColor(200, 200, 200, 20));
-    graph2->setChannelFillGraph(graph1);
-    graph2->setName("STD");
-
-    QCPGraph *graph3 = customPlot->addGraph();
     graph3->setData(v_x, v_std_down);
-    graph3->setPen(QPen(QColor(0,0,255,64),2));
-    graph3->setBrush(QColor(200, 200, 200, 20));
-    graph3->setChannelFillGraph(graph1);
-    graph3->setName("STD");
-
-    QCPGraph *graph4 = customPlot->addGraph();
     graph4->setData(v_x, v_best);
-   // graph1->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, QPen(Qt::black, 1.5), QBrush(Qt::white), 9));
-    graph4->setPen(QPen(QColor(20, 200, 20), 2));
-    graph4->setName("Best");
-
-    // set some pens, brushes and backgrounds:
-    customPlot->xAxis->setBasePen(QPen(Qt::white, 1));
-    customPlot->yAxis->setBasePen(QPen(Qt::white, 1));
-    customPlot->xAxis->setTickPen(QPen(Qt::white, 1));
-    customPlot->yAxis->setTickPen(QPen(Qt::white, 1));
-    customPlot->xAxis->setSubTickPen(QPen(Qt::white, 1));
-    customPlot->yAxis->setSubTickPen(QPen(Qt::white, 1));
-    customPlot->xAxis->setTickLabelColor(Qt::white);
-    customPlot->yAxis->setTickLabelColor(Qt::white);
-    customPlot->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-    customPlot->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
-    customPlot->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-    customPlot->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
-    customPlot->xAxis->grid()->setSubGridVisible(true);
-    customPlot->yAxis->grid()->setSubGridVisible(true);
-    customPlot->xAxis->grid()->setZeroLinePen(Qt::NoPen);
-    customPlot->yAxis->grid()->setZeroLinePen(Qt::NoPen);
-    customPlot->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
-    customPlot->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
-
-
-    QLinearGradient plotGradient;
-    plotGradient.setStart(0, 0);
-    plotGradient.setFinalStop(0, 350);
-    plotGradient.setColorAt(0, QColor(80, 80, 80));
-    plotGradient.setColorAt(1, QColor(50, 50, 50));
-    customPlot->setBackground(plotGradient);
 
     customPlot->rescaleAxes();
     customPlot->replot();
-    customPlot->resize(800,600);
-    customPlot->setWindowTitle("Robogen Generations Plot");
-    customPlot->show();
 
-    qDebug() << "PLOTTING" << v_best.length();
+    if(user_activated) {
+        customPlot->show();
+    }
 }
 
 void MainWindow::onPushStop()
@@ -364,7 +394,8 @@ void MainWindow::onFileChanged(QString filename)
         QDir dir(current_run_path);
         QStringList list = dir.entryList({"GenerationBest-*.json"});
         if(list.size() > 0) {
-            qDebug() << "generation " << list.size() << " done" << endl;
+            //qDebug() << "generation " << list.size() << " done" << endl;
+            onPushAnalyze(false);
             ui->progressBar->setValue(list.size());
         }
 
@@ -433,7 +464,7 @@ void MainWindow::onEvolveFinished(int s)
 
 void MainWindow::onFileEvent(const QString& str)
 {
-    qDebug() << str << endl;
+    //qDebug() << str << endl;
 }
 
 void MainWindow::onNewProject()

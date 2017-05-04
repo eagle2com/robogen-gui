@@ -45,7 +45,7 @@ public slots:
 
     void onPushSimulate();
     void onPushWebGL();
-    void onPushAnalyze();
+    void onPushAnalyze(bool user_activated = true);
     void onPushStop();
     void onFileChanged(QString filename);
     void onNewFileList(QStringList files);
@@ -122,6 +122,13 @@ private:
     void writeRobot();
 
     void closeEvent(QCloseEvent* ev);
+
+    // plotting
+    QCustomPlot* plot = nullptr;
+    QCPGraph* graph_best = nullptr;
+    QCPGraph* graph_avg = nullptr;
+    QCPGraph* graph_std_up = nullptr;
+    QCPGraph* graph_std_down = nullptr;
 };
 
 #endif // MAINWINDOW_H
