@@ -426,6 +426,7 @@ void MainWindow::onEvolveFinished(int s)
 
     onPushStop();
     current_running_config = nullptr;
+    current_run_path = "";
     ui->push_stop->setEnabled(false);
     ui->push_evolve->setEnabled(true);
 }
@@ -1085,6 +1086,10 @@ void MainWindow::onRunDeletePressed()
 {
     if(!ui->tree_runs->currentItem()) return;
     RunTreeItem* item = dynamic_cast<RunTreeItem*>(ui->tree_runs->currentItem());
+    if(current_run_path.split("/").last() == item->path) {
+        QMessageBox::warning(this, "Warning", "You are trying to delete the currently running evolution, please stop it first.");
+        return;
+    }
     QDir(current_config->root_directory + "/" + item->path).removeRecursively();
     current_config->run_list.removeOne(item);
     delete ui->tree_runs->currentItem();

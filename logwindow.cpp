@@ -18,8 +18,9 @@ LogWindow::LogWindow(QWidget *parent) :
     connect(ui->push_evolver_clear, SIGNAL(clicked(bool)), ui->list_error_evolver, SLOT(clear()));
     connect(ui->push_server_clear, SIGNAL(clicked(bool)), ui->list_error_server, SLOT(clear()));
     this->show();
-
+#ifdef Q_OS_WIN
     SetWindowPos((HWND)this->winId(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+#endif
 }
 
 LogWindow::~LogWindow()
