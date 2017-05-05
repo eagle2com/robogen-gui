@@ -90,6 +90,10 @@ private slots:
     void onLoadRobot();
     void loadRobotJson(const QString& filename);
 
+    void onCustomRobotBrowse();
+    void onCustomSimulationBrowse();
+    void onCustomEvolutionBrowse();
+
 private:
     Ui::MainWindow *ui;
 

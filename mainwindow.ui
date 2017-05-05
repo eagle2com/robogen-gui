@@ -250,7 +250,7 @@
         <item row="0" column="0">
          <widget class="QWidget" name="widget" native="true">
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="3" column="6">
+           <item row="3" column="7">
             <widget class="QComboBox" name="combo_evolutionmode">
              <property name="currentText">
               <string>brain</string>
@@ -280,7 +280,7 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="6">
+           <item row="0" column="7">
             <widget class="QComboBox" name="combo_selection">
              <item>
               <property name="text">
@@ -322,7 +322,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="6">
+           <item row="1" column="7">
             <widget class="QComboBox" name="combo_replacement">
              <item>
               <property name="text">
@@ -353,7 +353,7 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="6">
+           <item row="6" column="7">
             <widget class="QSpinBox" name="spin_seed">
              <property name="suffix">
               <string/>
@@ -390,10 +390,26 @@
              </property>
             </widget>
            </item>
+           <item row="13" column="3">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="3">
             <widget class="QSpinBox" name="spin_mu">
              <property name="minimum">
               <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>10000</number>
              </property>
              <property name="value">
               <number>20</number>
@@ -405,12 +421,15 @@
              <property name="minimum">
               <number>1</number>
              </property>
+             <property name="maximum">
+              <number>10000</number>
+             </property>
              <property name="value">
               <number>20</number>
              </property>
             </widget>
            </item>
-           <item row="8" column="6">
+           <item row="8" column="7">
             <widget class="QSpinBox" name="spin_maxbodyparts">
              <property name="suffix">
               <string/>
@@ -430,7 +449,7 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="6">
+           <item row="9" column="7">
             <widget class="QDoubleSpinBox" name="dspin_paddhiddenneuron">
              <property name="maximum">
               <double>1.000000000000000</double>
@@ -440,7 +459,7 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="6">
+           <item row="10" column="7">
             <widget class="QComboBox" name="combo_evolutionaryalgorithm">
              <property name="currentText">
               <string>Basic</string>
@@ -545,6 +564,13 @@
              </property>
             </widget>
            </item>
+           <item row="7" column="7">
+            <widget class="QCheckBox" name="check_randomseed">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
            <item row="6" column="5">
             <widget class="QLabel" name="label_17">
              <property name="text">
@@ -562,13 +588,6 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="6">
-            <widget class="QCheckBox" name="check_randomseed">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="5">
             <widget class="QLabel" name="label_28">
              <property name="toolTip">
@@ -579,7 +598,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="6">
+           <item row="2" column="7">
             <widget class="QSpinBox" name="spin_tournament">
              <property name="minimum">
               <number>1</number>
@@ -662,6 +681,9 @@
              </property>
             </widget>
            </item>
+           <item row="11" column="7">
+            <widget class="QLineEdit" name="line_custom_evolution"/>
+           </item>
            <item row="3" column="3">
             <widget class="QDoubleSpinBox" name="dspin_pbrainmutate">
              <property name="maximum">
@@ -688,26 +710,17 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="3">
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="11" column="6">
-            <widget class="QLineEdit" name="line_custom_evolution"/>
-           </item>
            <item row="11" column="5">
             <widget class="QCheckBox" name="check_custom_evolution">
              <property name="text">
               <string>Custom File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="8">
+            <widget class="QPushButton" name="push_custom_evolution_browse">
+             <property name="text">
+              <string>Browse</string>
              </property>
             </widget>
            </item>
@@ -724,6 +737,13 @@
         <item row="0" column="0">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QGridLayout" name="gridLayout_7">
+           <item row="11" column="1">
+            <widget class="QLineEdit" name="line_obstacles">
+             <property name="placeholderText">
+              <string>No osbstacles if empty</string>
+             </property>
+            </widget>
+           </item>
            <item row="3" column="0">
             <widget class="QLabel" name="label_32">
              <property name="text">
@@ -931,12 +951,8 @@
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
-            <widget class="QLineEdit" name="line_obstacles">
-             <property name="placeholderText">
-              <string>No osbstacles if empty</string>
-             </property>
-            </widget>
+           <item row="1" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_simulation"/>
            </item>
            <item row="3" column="1">
             <widget class="QSpinBox" name="spin_ntimesteps">
@@ -964,6 +980,13 @@
              </property>
             </spacer>
            </item>
+           <item row="0" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_scenario">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="3">
             <widget class="QCheckBox" name="check_custom_simulation">
              <property name="text">
@@ -971,13 +994,10 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="4" colspan="2">
-            <widget class="QLineEdit" name="line_custom_simulation"/>
-           </item>
-           <item row="0" column="4" colspan="2">
-            <widget class="QLineEdit" name="line_custom_scenario">
-             <property name="enabled">
-              <bool>true</bool>
+           <item row="1" column="6">
+            <widget class="QPushButton" name="push_custom_simulation_browse">
+             <property name="text">
+              <string>Browse</string>
              </property>
             </widget>
            </item>
@@ -1015,7 +1035,7 @@
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
-              <item row="4" column="0" colspan="2">
+              <item row="4" column="0" colspan="3">
                <widget class="QFrame" name="frame_6">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
@@ -1057,7 +1077,7 @@
                 </layout>
                </widget>
               </item>
-              <item row="0" column="0" colspan="3">
+              <item row="0" column="0" colspan="4">
                <widget class="QFrame" name="frame_2">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
@@ -1083,7 +1103,7 @@
                 </layout>
                </widget>
               </item>
-              <item row="1" column="0" colspan="3">
+              <item row="1" column="0" colspan="4">
                <widget class="QFrame" name="frame_3">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
@@ -1158,14 +1178,14 @@
                 </layout>
                </widget>
               </item>
-              <item row="2" column="0" colspan="3">
+              <item row="2" column="0" colspan="4">
                <widget class="QLineEdit" name="robotPartNameEdit">
                 <property name="placeholderText">
                  <string>Part Name</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="7" column="2">
                <spacer name="verticalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -1185,7 +1205,7 @@
                 </property>
                </widget>
               </item>
-              <item row="7" column="1">
+              <item row="8" column="2">
                <widget class="QPushButton" name="push_load">
                 <property name="toolTip">
                  <string>Load robot config from *txt or *json</string>
@@ -1198,10 +1218,17 @@
               <item row="5" column="0">
                <widget class="QLineEdit" name="line_custom_robot"/>
               </item>
-              <item row="5" column="1">
+              <item row="5" column="2">
                <widget class="QCheckBox" name="check_custom_robot">
                 <property name="text">
                  <string>Custom File</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="2">
+               <widget class="QPushButton" name="push_custom_robot_browse">
+                <property name="text">
+                 <string>Browse</string>
                 </property>
                </widget>
               </item>
@@ -1446,7 +1473,7 @@
   </action>
   <action name="actionLog">
    <property name="text">
-    <string>Log</string>
+    <string>&amp;Log</string>
    </property>
   </action>
  </widget>

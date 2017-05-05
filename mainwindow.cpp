@@ -78,7 +78,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // ========================== EVOLUTION TAB SETUP =================================
 
-
+    connect(ui->push_custom_robot_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomRobotBrowse()));
+    connect(ui->push_custom_simulation_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomSimulationBrowse()));
+    connect(ui->push_custom_evolution_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomEvolutionBrowse()));
 
     //  =========================== ROBOT TAB SETUP ===================================
     ui->robotConfigTree->expandAll();
@@ -498,6 +500,8 @@ void MainWindow::onOpenProject()
     QJsonObject main_object = doc.object();
     settings_window->set_robogen_directory(main_object["robogen_directory"].toString());
 
+    ui->spin_threads->setValue(main_object["n_threads"].toInt());
+
     QJsonArray configs = main_object["configurations"].toArray();
     for(int i = 0; i < configs.size(); i++) {
         QJsonObject config = configs[i].toObject();
@@ -612,6 +616,7 @@ bool MainWindow::onSaveProject()
     QJsonObject main_object;
 
     main_object["robogen_directory"] = settings_window->get_robogen_directory();
+    main_object["n_threads"] = ui->spin_threads->value();
 
     QJsonArray config_array;
     for(int i = 0; i < ui->tree_project->count(); i++) {
@@ -826,7 +831,20 @@ void MainWindow::onEvolve()
 
         if(ui->check_custom_robot->isChecked()) {
             QFile(project_directory + "/tmp/robot.txt").remove();
-            QFile::copy(ui->line_custom_robot->text(), project_directory + "/tmp/robot.txt");
+            // if the robot is in the json format, we need to convert it to the txt format using
+            // the python tool because we are lazy
+            if(ui->line_custom_robot->text().split(".").back() == "json") {
+                QProcess process_convert;
+                process_convert.setProcessChannelMode(QProcess::ForwardedChannels);
+                QStringList conv_args;
+                conv_args << robogen_path + "/../python/json_converter.py" << ui->line_custom_robot->text() << project_directory + "/tmp/robot.txt";
+                process_convert.start("python", conv_args);
+                if(!process_convert.waitForFinished(1000)) {
+                    QMessageBox::critical(this, "Error", "Robot format conversion failed!!!");
+                }
+            } else {
+                QFile::copy(ui->line_custom_robot->text(), project_directory + "/tmp/robot.txt");
+            }
         }
 
         if(ui->check_custom_simulation->isChecked()) {
@@ -1199,6 +1217,42 @@ void MainWindow::loadRobotJson(const QString &filename)
     current_config->robot->root_part = new_root_part;
     current_config->robot->root_part->update();
     loadRobot();
+}
+
+void MainWindow::onCustomRobotBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose robot config file", "", "*.json *.txt");
+    if(filename == "")
+        return;
+
+    ui->line_custom_robot->setText(filename);
+}
+
+void MainWindow::onCustomSimulationBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose scenario config file", "", "*.txt");
+    if(filename == "")
+        return;
+
+    ui->line_custom_scenario->setText(filename);
+}
+
+void MainWindow::onCustomEvolutionBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose evolution config file", "", "*.txt");
+    if(filename == "")
+        return;
+
+    ui->line_custom_evolution->setText(filename);
 }
 
 
