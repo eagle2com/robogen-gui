@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
+    <width>1001</width>
     <height>584</height>
    </rect>
   </property>
@@ -737,10 +737,20 @@
         <item row="0" column="0">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QGridLayout" name="gridLayout_7">
+           <item row="12" column="1">
+            <widget class="QLineEdit" name="line_positions">
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_simulation"/>
+           </item>
            <item row="11" column="1">
             <widget class="QLineEdit" name="line_obstacles">
              <property name="placeholderText">
-              <string>No osbstacles if empty</string>
+              <string/>
              </property>
             </widget>
            </item>
@@ -842,7 +852,7 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="0">
+           <item row="14" column="0">
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -951,8 +961,12 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="4" colspan="2">
-            <widget class="QLineEdit" name="line_custom_simulation"/>
+           <item row="0" column="4" colspan="2">
+            <widget class="QLineEdit" name="line_custom_scenario">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item row="3" column="1">
             <widget class="QSpinBox" name="spin_ntimesteps">
@@ -980,13 +994,6 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="4" colspan="2">
-            <widget class="QLineEdit" name="line_custom_scenario">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="3">
             <widget class="QCheckBox" name="check_custom_simulation">
              <property name="text">
@@ -996,6 +1003,48 @@
            </item>
            <item row="1" column="6">
             <widget class="QPushButton" name="push_custom_simulation_browse">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2">
+            <widget class="QPushButton" name="push_obstacles_browse">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>Position File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="1">
+            <widget class="QLineEdit" name="line_lights">
+             <property name="placeholderText">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="0">
+            <widget class="QLabel" name="label_44">
+             <property name="text">
+              <string>Light File</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="2">
+            <widget class="QPushButton" name="push_positions_browse">
+             <property name="text">
+              <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="2">
+            <widget class="QPushButton" name="push_lights_browse">
              <property name="text">
               <string>Browse</string>
              </property>
@@ -1315,7 +1364,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>965</width>
+     <width>1001</width>
      <height>19</height>
     </rect>
    </property>

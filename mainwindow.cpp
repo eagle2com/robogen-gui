@@ -81,6 +81,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->push_custom_robot_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomRobotBrowse()));
     connect(ui->push_custom_simulation_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomSimulationBrowse()));
     connect(ui->push_custom_evolution_browse, SIGNAL(clicked(bool)), this, SLOT(onCustomEvolutionBrowse()));
+    connect(ui->push_obstacles_browse, SIGNAL(clicked(bool)), this, SLOT(onObstaclesBrowse()));
+    connect(ui->push_lights_browse, SIGNAL(clicked(bool)), this, SLOT(onLightsBrowse()));
+    connect(ui->push_positions_browse, SIGNAL(clicked(bool)), this, SLOT(onPositionsBrowse()));
 
     //  =========================== ROBOT TAB SETUP ===================================
     ui->robotConfigTree->expandAll();
@@ -1255,6 +1258,42 @@ void MainWindow::onCustomEvolutionBrowse()
     ui->line_custom_evolution->setText(filename);
 }
 
+void MainWindow::onObstaclesBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose obstacle config file", "", "*.txt");
+    if(filename == "")
+        return;
+
+    ui->line_obstacles->setText(filename);
+}
+
+void MainWindow::onPositionsBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose position config file", "", "*.txt");
+    if(filename == "")
+        return;
+
+    ui->line_positions->setText(filename);
+}
+
+void MainWindow::onLightsBrowse()
+{
+    if(!current_config)
+        return;
+
+    QString filename = QFileDialog::getOpenFileName(this,"Choose light config file", "", "*.txt");
+    if(filename == "")
+        return;
+
+    ui->line_lights->setText(filename);
+}
+
 
 void MainWindow::writeEvolution()
 {
@@ -1335,6 +1374,14 @@ void MainWindow::writeSimulation()
         if(ui->line_obstacles->text().length() > 0) {
             stream <<"obstaclesConfigFile="<< ui->line_obstacles->text() << endl;
         }
+        if(ui->line_positions->text().length() > 0) {
+            stream <<"startPositionConfigFile=" << ui->line_positions->text() << endl;
+        }
+
+        if(ui->line_lights->text().length() > 0) {
+            stream <<"lightSourcesConfigFile=" << ui->line_lights->text() << endl;
+        }
+
     }
     else
     {

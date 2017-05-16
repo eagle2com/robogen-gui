@@ -94,6 +94,10 @@ private slots:
     void onCustomSimulationBrowse();
     void onCustomEvolutionBrowse();
 
+    void onObstaclesBrowse();
+    void onPositionsBrowse();
+    void onLightsBrowse();
+
 private:
     Ui::MainWindow *ui;
 
