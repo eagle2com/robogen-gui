@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1041</width>
+    <width>1047</width>
     <height>584</height>
    </rect>
   </property>
@@ -141,7 +141,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_overview">
        <attribute name="title">
@@ -250,6 +250,19 @@
         <item row="0" column="0">
          <widget class="QWidget" name="widget" native="true">
           <layout class="QGridLayout" name="gridLayout_3">
+           <item row="13" column="3">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="3" column="7">
             <widget class="QComboBox" name="combo_evolutionmode">
              <property name="currentText">
@@ -389,19 +402,6 @@
               <double>0.000000000000000</double>
              </property>
             </widget>
-           </item>
-           <item row="13" column="3">
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="0" column="3">
             <widget class="QSpinBox" name="spin_mu">
@@ -544,6 +544,13 @@
              </property>
             </widget>
            </item>
+           <item row="7" column="7">
+            <widget class="QCheckBox" name="check_randomseed">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
            <item row="4" column="3">
             <widget class="QDoubleSpinBox" name="dspin_brainsigma">
              <property name="maximum">
@@ -561,13 +568,6 @@
             <widget class="QLabel" name="label_11">
              <property name="text">
               <string>pNodeRemove</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="7">
-            <widget class="QCheckBox" name="check_randomseed">
-             <property name="text">
-              <string/>
              </property>
             </widget>
            </item>
@@ -608,6 +608,13 @@
              </property>
             </widget>
            </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>pBrainCrossover</string>
+             </property>
+            </widget>
+           </item>
            <item row="12" column="0">
             <widget class="QLabel" name="label_12">
              <property name="text">
@@ -635,13 +642,6 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>pBrainCrossover</string>
-             </property>
-            </widget>
-           </item>
            <item row="12" column="3">
             <widget class="QDoubleSpinBox" name="dspin_pparemetermodify">
              <property name="maximum">
@@ -654,6 +654,9 @@
               <double>0.100000000000000</double>
              </property>
             </widget>
+           </item>
+           <item row="11" column="7">
+            <widget class="QLineEdit" name="line_custom_evolution"/>
            </item>
            <item row="7" column="3">
             <widget class="QDoubleSpinBox" name="dspin_pnodeinsert">
@@ -680,9 +683,6 @@
               <number>50</number>
              </property>
             </widget>
-           </item>
-           <item row="11" column="7">
-            <widget class="QLineEdit" name="line_custom_evolution"/>
            </item>
            <item row="3" column="3">
             <widget class="QDoubleSpinBox" name="dspin_pbrainmutate">
@@ -721,6 +721,23 @@
             <widget class="QPushButton" name="push_custom_evolution_browse">
              <property name="text">
               <string>Browse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="5">
+            <widget class="QLabel" name="label_79">
+             <property name="toolTip">
+              <string>Set true to continue evolving from the provided brain instead of re-initialising. N.B. This only works with the basic EA, not with HyperNEAT.</string>
+             </property>
+             <property name="text">
+              <string>Use Brain Seed</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="7">
+            <widget class="QCheckBox" name="check_usebrainseed">
+             <property name="text">
+              <string/>
              </property>
             </widget>
            </item>
@@ -1390,7 +1407,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1041</width>
+     <width>1047</width>
      <height>19</height>
     </rect>
    </property>

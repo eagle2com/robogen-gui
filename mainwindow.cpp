@@ -1319,6 +1319,7 @@ void MainWindow::writeEvolution()
         stream <<"tournamentSize="<< ui->spin_tournament->value() << endl;
         stream <<"numGenerations="<< ui->spin_generations->value() << endl;
         stream <<"evolutionMode="<< ui->combo_evolutionmode->currentText() << endl;
+        stream <<"useBrainSeed=" << ui->check_usebrainseed->isChecked() << endl;
         stream <<"pBrainMutate="<< ui->dspin_pbrainmutate->value() << endl;
         stream <<"brainSigma="<< ui->dspin_brainsigma->value() << endl;
         stream <<"pBrainCrossover="<< ui->dspin_pbraincrossover->value() << endl;
