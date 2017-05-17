@@ -1371,6 +1371,7 @@ void MainWindow::writeSimulation()
         stream <<"sensorNoiseLevel="<< ui->dspin_sensornoiselevel->value() << endl;
         stream <<"motorNoiseLevel="<< ui->dspin_motornoiselevel->value() << endl;
         stream <<"capAcceleration="<< (ui->check_capacceleration->isChecked() ? "true": "false") << endl;
+        stream <<"maxDirectionShiftsPerSecond=" << ui->spin_max_dir_shifts->value() << endl;
         if(ui->line_obstacles->text().length() > 0) {
             stream <<"obstaclesConfigFile="<< ui->line_obstacles->text() << endl;
         }
