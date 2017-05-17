@@ -196,7 +196,11 @@ void MainWindow::loadSimulation()
 
 void MainWindow::onPushSimulate()
 {
+#if defined(Q_OS_WIN)
+    QString program = settings_window->get_robogen_directory() + "/robogen-file-viewer.exe";
+#elif defined(Q_OS_LINUX)
     QString program = settings_window->get_robogen_directory() + "/robogen-file-viewer";
+#endif
     QStringList arguments;
 
     if(!ui->tree_runs->currentItem()) return;
